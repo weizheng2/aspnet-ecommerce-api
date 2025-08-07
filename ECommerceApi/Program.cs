@@ -22,9 +22,6 @@ builder.Services.AddCustomRateLimiting();
 builder.Services.AddCustomApiVersioning();
 builder.Services.AddCustomSwagger();
 
-// TEST get strongly typed configuration data 
-//builder.Services.AddOptions<PersonOptions>().Bind(builder.Configuration.GetSection(PersonOptions.SectionName)).ValidateDataAnnotations().ValidateOnStart();
-
 // Database
 builder.Services.AddDbContext<ApplicationDbContext>(options => options.UseSqlServer(builder.Configuration.GetConnectionString("DefaultConnection")));
 
