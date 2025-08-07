@@ -1,6 +1,7 @@
 using ECommerceApi.Data;
 using ECommerceApi.Extensions;
 using ECommerceApi.Models;
+using ECommerceApi.Swagger;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.EntityFrameworkCore;
 
@@ -19,7 +20,7 @@ builder.Services.AddCustomRateLimiting();
 // builder.Services.AddCustomCaching(builder.Configuration); // Redis Cache
 
 builder.Services.AddCustomApiVersioning();
-// builder.Services.AddCustomSwagger();
+builder.Services.AddCustomSwagger();
 
 // TEST get strongly typed configuration data 
 //builder.Services.AddOptions<PersonOptions>().Bind(builder.Configuration.GetSection(PersonOptions.SectionName)).ValidateDataAnnotations().ValidateOnStart();
@@ -49,7 +50,7 @@ using (var scope = app.Services.CreateScope())
 }
 
 // Start Middlewares
-//app.UseCustomSwagger();
+app.UseCustomSwagger();
 app.UseStaticFiles();
 //app.UseOutputCache(); // Redis Cache
 app.UseCors();
