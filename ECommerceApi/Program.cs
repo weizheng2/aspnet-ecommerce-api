@@ -1,4 +1,5 @@
 using ECommerceApi.Data;
+using ECommerceApi.Extensions;
 using ECommerceApi.Models;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.EntityFrameworkCore;
@@ -17,7 +18,7 @@ builder.Services.AddCustomRateLimiting();
 // builder.Services.AddAllowedHostsCors(builder.Configuration);
 // builder.Services.AddCustomCaching(builder.Configuration); // Redis Cache
 
-// builder.Services.AddCustomApiVersioning();
+builder.Services.AddCustomApiVersioning();
 // builder.Services.AddCustomSwagger();
 
 // TEST get strongly typed configuration data 
