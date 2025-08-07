@@ -1,10 +1,61 @@
+using ECommerceApi.Data;
+using ECommerceApi.Models;
+using Microsoft.AspNetCore.Identity;
+using Microsoft.EntityFrameworkCore;
+
 var builder = WebApplication.CreateBuilder(args);
 
-// Add services to the container.
-// Learn more about configuring OpenAPI at https://aka.ms/aspnet/openapi
-builder.Services.AddOpenApi();
+// Start Services
+builder.Services.AddHttpContextAccessor(); // Represents everything about the current HTTP Request
+builder.Services.AddDataProtection();
+builder.Services.AddControllers().AddNewtonsoftJson();
+
+// builder.Services.AddCustomRateLimiting();
+// builder.Services.AddJwtAuthentication(builder.Configuration);
+// builder.Services.AddAuthorizationBasedOnPolicy();
+
+// builder.Services.AddAllowedHostsCors(builder.Configuration);
+// builder.Services.AddCustomCaching(builder.Configuration); // Redis Cache
+
+// builder.Services.AddCustomApiVersioning();
+// builder.Services.AddCustomSwagger();
+
+// TEST get strongly typed configuration data 
+//builder.Services.AddOptions<PersonOptions>().Bind(builder.Configuration.GetSection(PersonOptions.SectionName)).ValidateDataAnnotations().ValidateOnStart();
+
+// Database
+builder.Services.AddDbContext<ApplicationDbContext>(options => options.UseSqlServer(builder.Configuration.GetConnectionString("DefaultConnection")));
+
+// Users Database
+builder.Services.AddIdentityCore<User>().AddEntityFrameworkStores<ApplicationDbContext>().AddDefaultTokenProviders();
+builder.Services.AddScoped<UserManager<User>>();
+builder.Services.AddScoped<SignInManager<User>>();
+
+// builder.Services.AddTransient<IUserServices, UserServices>();
+// builder.Services.AddTransient<IHashService, HashService>();
+// builder.Services.AddTransient<IArchiveStorage, ArchiveStorageAzure>();
+//builder.Services.AddTransient<IArchiveStorage, ArchiveStorageLocal>();
 
 var app = builder.Build();
+
+using (var scope = app.Services.CreateScope())
+{
+    var dbContext = scope.ServiceProvider.GetRequiredService<ApplicationDbContext>();
+    if (dbContext.Database.IsRelational())
+    {
+        dbContext.Database.Migrate();
+    }
+}
+
+// Start Middlewares
+//app.UseCustomSwagger();
+app.UseStaticFiles();
+//app.UseOutputCache(); // Redis Cache
+app.UseCors();
+app.UseRateLimiter();
+
+//app.UseExceptionLogging();
+//app.UseLogPetition();
 
 // Configure the HTTP request pipeline.
 if (app.Environment.IsDevelopment())
@@ -12,30 +63,5 @@ if (app.Environment.IsDevelopment())
     app.MapOpenApi();
 }
 
-app.UseHttpsRedirection();
-
-var summaries = new[]
-{
-    "Freezing", "Bracing", "Chilly", "Cool", "Mild", "Warm", "Balmy", "Hot", "Sweltering", "Scorching"
-};
-
-app.MapGet("/weatherforecast", () =>
-{
-    var forecast =  Enumerable.Range(1, 5).Select(index =>
-        new WeatherForecast
-        (
-            DateOnly.FromDateTime(DateTime.Now.AddDays(index)),
-            Random.Shared.Next(-20, 55),
-            summaries[Random.Shared.Next(summaries.Length)]
-        ))
-        .ToArray();
-    return forecast;
-})
-.WithName("GetWeatherForecast");
-
+app.MapControllers();
 app.Run();
-
-record WeatherForecast(DateOnly Date, int TemperatureC, string? Summary)
-{
-    public int TemperatureF => 32 + (int)(TemperatureC / 0.5556);
-}
