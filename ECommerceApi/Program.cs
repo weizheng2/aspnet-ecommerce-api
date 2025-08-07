@@ -10,7 +10,7 @@ builder.Services.AddHttpContextAccessor(); // Represents everything about the cu
 builder.Services.AddDataProtection();
 builder.Services.AddControllers().AddNewtonsoftJson();
 
-// builder.Services.AddCustomRateLimiting();
+builder.Services.AddCustomRateLimiting();
 // builder.Services.AddJwtAuthentication(builder.Configuration);
 // builder.Services.AddAuthorizationBasedOnPolicy();
 
