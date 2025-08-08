@@ -9,7 +9,13 @@ namespace ECommerceApi.Data
         public ApplicationDbContext(DbContextOptions<ApplicationDbContext> options) : base(options)
         {
         }
+        protected override void OnModelCreating(ModelBuilder modelBuilder)
+        {
+            modelBuilder.Entity<OrderItem>().Property(o => o.UnitPrice).HasPrecision(18, 2);
+            modelBuilder.Entity<Product>().Property(p => p.Price).HasPrecision(18, 2);
 
+            base.OnModelCreating(modelBuilder);
+        }
         public DbSet<Product> Products { get; set; }
         public DbSet<Cart> Carts { get; set; }
         public DbSet<CartItem> CartItems { get; set; }

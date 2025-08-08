@@ -1,6 +1,7 @@
 using ECommerceApi.Data;
 using ECommerceApi.Extensions;
 using ECommerceApi.Models;
+using ECommerceApi.Services;
 using ECommerceApi.Swagger;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.EntityFrameworkCore;
@@ -30,7 +31,7 @@ builder.Services.AddIdentityCore<User>().AddEntityFrameworkStores<ApplicationDbC
 builder.Services.AddScoped<UserManager<User>>();
 builder.Services.AddScoped<SignInManager<User>>();
 
-// builder.Services.AddTransient<IUserServices, UserServices>();
+builder.Services.AddTransient<IProductService, ProductService>();
 // builder.Services.AddTransient<IHashService, HashService>();
 // builder.Services.AddTransient<IArchiveStorage, ArchiveStorageAzure>();
 //builder.Services.AddTransient<IArchiveStorage, ArchiveStorageLocal>();

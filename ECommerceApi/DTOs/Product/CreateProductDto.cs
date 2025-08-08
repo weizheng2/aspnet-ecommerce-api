@@ -1,11 +1,10 @@
 using System.ComponentModel.DataAnnotations;
 using Microsoft.EntityFrameworkCore;
 
-namespace ECommerceApi.Models
+namespace ECommerceApi.DTOs
 {
-    public class Product
+    public class CreateProductDto
     {
-        public int Id { get; set; }
 
         [Required(ErrorMessage = "The {0} field is required.")]
         [StringLength(20, ErrorMessage = "The {0} field must be a string with a maximum length of {1}.")]
@@ -25,5 +24,4 @@ namespace ECommerceApi.Models
         [Url(ErrorMessage = "The {0} field must be a valid URL.")]
         public string? ImageUrl { get; set; }
     }
-
 }
