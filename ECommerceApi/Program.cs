@@ -14,14 +14,14 @@ builder.Services.AddDataProtection();
 builder.Services.AddControllers().AddNewtonsoftJson();
 
 builder.Services.AddCustomRateLimiting();
-// builder.Services.AddJwtAuthentication(builder.Configuration);
-// builder.Services.AddAuthorizationBasedOnPolicy();
+builder.Services.AddJwtAuthentication(builder.Configuration);
+builder.Services.AddAuthorizationBasedOnPolicy();
 
 // builder.Services.AddAllowedHostsCors(builder.Configuration);
-// builder.Services.AddCustomCaching(builder.Configuration); // Redis Cache
 
 builder.Services.AddCustomApiVersioning();
 builder.Services.AddCustomSwagger();
+builder.Services.AddCustomIdentityOptions();
 
 // Database
 builder.Services.AddDbContext<ApplicationDbContext>(options => options.UseSqlServer(builder.Configuration.GetConnectionString("DefaultConnection")));
@@ -31,10 +31,10 @@ builder.Services.AddIdentityCore<User>().AddEntityFrameworkStores<ApplicationDbC
 builder.Services.AddScoped<UserManager<User>>();
 builder.Services.AddScoped<SignInManager<User>>();
 
+// Services 
+builder.Services.AddTransient<IUserServices, UserServices>();
 builder.Services.AddTransient<IProductService, ProductService>();
-// builder.Services.AddTransient<IHashService, HashService>();
 // builder.Services.AddTransient<IArchiveStorage, ArchiveStorageAzure>();
-//builder.Services.AddTransient<IArchiveStorage, ArchiveStorageLocal>();
 
 var app = builder.Build();
 
@@ -50,12 +50,10 @@ using (var scope = app.Services.CreateScope())
 // Start Middlewares
 app.UseCustomSwagger();
 app.UseStaticFiles();
-//app.UseOutputCache(); // Redis Cache
 app.UseCors();
 app.UseRateLimiter();
 
 //app.UseExceptionLogging();
-//app.UseLogPetition();
 
 // Configure the HTTP request pipeline.
 if (app.Environment.IsDevelopment())

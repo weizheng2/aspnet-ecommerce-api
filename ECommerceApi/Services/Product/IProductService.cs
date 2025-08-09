@@ -1,6 +1,5 @@
 using ECommerceApi.DTOs;
 using ECommerceApi.Utils;
-using Microsoft.AspNetCore.Mvc;
 
 namespace ECommerceApi.Services
 {

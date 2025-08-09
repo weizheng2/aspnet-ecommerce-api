@@ -1,0 +1,142 @@
+using Microsoft.AspNetCore.Identity;
+using ECommerceApi.Models;
+using ECommerceApi.Utils;
+using ECommerceApi.DTOs;
+using System.Security.Claims;
+using Microsoft.IdentityModel.Tokens;
+using System.Text;
+using System.IdentityModel.Tokens.Jwt;
+
+namespace ECommerceApi.Services
+{
+    public class UserServices : IUserServices
+    {
+        private readonly IConfiguration _configuration;
+        private readonly UserManager<User> _userManager;
+        private readonly SignInManager<User> _signInManager;
+        private readonly IHttpContextAccessor _contextAccessor;
+
+        public UserServices(IConfiguration configuration, UserManager<User> userManager,
+            SignInManager<User> signInManager, IHttpContextAccessor contextAccessor)
+        {
+            _userManager = userManager;
+            _configuration = configuration;
+            _signInManager = signInManager;
+            _contextAccessor = contextAccessor;
+        }
+
+        public async Task<User?> GetUser()
+        {
+            var emailClaim = _contextAccessor.HttpContext!.User.Claims.Where(x => x.Type == "email").FirstOrDefault();
+
+            if (emailClaim is null)
+                return null;
+
+            var email = emailClaim.Value;
+            return await _userManager.FindByEmailAsync(email);
+        }
+
+        private async Task<AuthenticationResponseDto> CreateToken(UserCredentialsDto credentialsDto)
+        {
+             // Add claims
+            var claims = new List<Claim>
+            {
+                new Claim("email", credentialsDto.Email),
+            };
+
+            var user = await _userManager.FindByEmailAsync(credentialsDto.Email);
+            var existingClaims = await _userManager.GetClaimsAsync(user!);
+
+            claims.AddRange(existingClaims);
+
+            var jwtSigningKey = new SymmetricSecurityKey(Encoding.UTF8.GetBytes(_configuration["Jwt:SigningKey"]!));
+            var credentials = new SigningCredentials(jwtSigningKey, SecurityAlgorithms.HmacSha256);
+
+            var expirationMinutes = _configuration.GetValue<int>("Jwt:ExpirationMinutes");
+            var expiration = DateTime.UtcNow.AddMinutes(expirationMinutes);
+            
+            var securityToken = new JwtSecurityToken(
+                issuer: _configuration["Jwt:Issuer"],
+                audience: _configuration["Jwt:Audience"],
+                claims: claims,
+                expires: expiration,
+                signingCredentials: credentials
+            );
+
+            var token = new JwtSecurityTokenHandler().WriteToken(securityToken);
+
+            return new AuthenticationResponseDto
+            {
+                Token = token,
+                Expiration = expiration
+            };
+        }
+
+        public async Task<Result<AuthenticationResponseDto>> Register(UserCredentialsDto credentialsDto)
+        {
+            var user = new User
+            {
+                UserName = credentialsDto.Email
+            };
+
+            var result = await _userManager.CreateAsync(user, credentialsDto.Password!);
+            if (result.Succeeded)
+            {
+                var token = await CreateToken(credentialsDto);
+                return Result<AuthenticationResponseDto>.Success(token);
+            }
+            else
+            {
+                return Result<AuthenticationResponseDto>.Failure(ResultErrorType.ValidationError, "Incorrect Registration");
+            }
+        }
+
+        public async Task<Result<AuthenticationResponseDto>> Login(UserCredentialsDto credentialsDto)
+        {
+            var user = await _userManager.FindByEmailAsync(credentialsDto.Email);
+            if (user is null)
+                return Result<AuthenticationResponseDto>.Failure(ResultErrorType.ValidationError, "Incorrect Login");
+     
+            var result = await _signInManager.CheckPasswordSignInAsync(user, credentialsDto.Password!, lockoutOnFailure: false);
+            if (result.Succeeded)
+            {
+                var token = await CreateToken(credentialsDto);
+                return Result<AuthenticationResponseDto>.Success(token);
+            }
+
+            return Result<AuthenticationResponseDto>.Failure(ResultErrorType.ValidationError, "Incorrect Login");
+        }
+
+        public async Task<Result<AuthenticationResponseDto>> UpdateToken()
+        {
+            var user = await GetUser();
+            if (user is null)
+                return Result<AuthenticationResponseDto>.Failure(ResultErrorType.NotFound);
+
+            var userCredentialsDto = new UserCredentialsDto { Email = user.Email! };
+            var token = await CreateToken(userCredentialsDto);
+
+            return Result<AuthenticationResponseDto>.Success(token);
+        }
+        
+        public async Task<Result> MakeAdmin(EditClaimDto editClaimDto)
+        {
+            var user = await _userManager.FindByEmailAsync(editClaimDto.Email);
+            if (user is null)
+                return Result.Failure(ResultErrorType.NotFound);
+
+            var existingClaims  = await _userManager.GetClaimsAsync(user);
+            if (existingClaims.Any(c => c.Type == "isAdmin" && c.Value == "true"))
+                return Result.Failure(ResultErrorType.ValidationError, "User is already an admin");
+
+            var claim = new Claim("isAdmin", "true");
+            var result = await _userManager.AddClaimAsync(user, claim);
+                
+            if (!result.Succeeded)
+                return Result.Failure(ResultErrorType.ValidationError, "Failed to add admin claim");
+
+            return Result.Success();
+        }
+
+    }
+}
