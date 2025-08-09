@@ -21,16 +21,16 @@ namespace LibraryApi.Controllers
         }
 
         [HttpGet]
-        public async Task<ActionResult<List<GetProductDto>>> GetAllProducts()
+        public async Task<ActionResult<PagedResult<GetProductDto>>> GetAllProducts([FromQuery] PaginationDto paginationDto)
         {
-            var result = await _productService.GetAllProductsAsync();
+            var result = await _productService.GetAllProductsAsync(paginationDto);
             return Ok(result.Data);
         }
 
         [HttpGet("filter")]
-        public async Task<ActionResult<List<GetProductDto>>> GetProductsWithFilter()
+        public async Task<ActionResult<PagedResult<GetProductDto>>> GetProductsWithFilter([FromQuery] FilterProductDto filterProductDto)
         {
-            var result = await _productService.GetProductsFilterAsync();
+            var result = await _productService.GetProductsFilterAsync(filterProductDto);
             return Ok(result.Data);
         }
 

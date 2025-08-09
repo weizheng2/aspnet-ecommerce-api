@@ -1,6 +1,10 @@
+using System.Linq.Expressions;
 using ECommerceApi.Data;
 using ECommerceApi.DTOs;
+using ECommerceApi.Extensions;
+using ECommerceApi.Models;
 using ECommerceApi.Utils;
+using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
 
 namespace ECommerceApi.Services
@@ -14,21 +18,44 @@ namespace ECommerceApi.Services
             _context = context;
         }
 
-        public async Task<Result<List<GetProductDto>>> GetAllProductsAsync()
+        public async Task<Result<PagedResult<GetProductDto>>> GetAllProductsAsync(PaginationDto paginationDto)
         {
-            var products = await _context.Products.ToListAsync();
+            var query = _context.Products.AsQueryable();
+
+            var totalRecords = await query.CountAsync();
+            var products = await query.Page(paginationDto).ToListAsync();
             var productsDto = products.Select(p => p.ToGetProductDto()).ToList();
 
-            return Result<List<GetProductDto>>.Success(productsDto);
+            var result = PagedResultHelper.Create(productsDto, totalRecords, paginationDto);
+            return Result<PagedResult<GetProductDto>>.Success(result);
         }
 
-        public async Task<Result<List<GetProductDto>>> GetProductsFilterAsync()
+        public async Task<Result<PagedResult<GetProductDto>>> GetProductsFilterAsync(FilterProductDto filterProductDto)
         {
-            // Todo - Implement filtering logic here
-            var products = await _context.Products.ToListAsync();
+            var query = _context.Products.AsQueryable();
+
+            // Apply filters
+            if (!string.IsNullOrEmpty(filterProductDto.Name))
+                query = query.Where(p => p.Name.Contains(filterProductDto.Name));
+
+            var orderBySelectors = new Dictionary<ProductOrderBy, Expression<Func<Product, object>>>
+            {
+                [ProductOrderBy.Name] = p => p.Name!,
+                [ProductOrderBy.Price] = p => p.Price!
+            };
+
+            if (orderBySelectors.TryGetValue(filterProductDto.OrderBy, out var selector))
+                query = filterProductDto.AscendingOrder ? query.OrderBy(selector) : query.OrderByDescending(selector);
+            else
+                query = query.OrderBy(p => p.Name);
+
+            // Apply pagination
+            var totalRecords = await query.CountAsync();
+            var products = await query.Page(filterProductDto).ToListAsync();
             var productsDto = products.Select(p => p.ToGetProductDto()).ToList();
 
-            return Result<List<GetProductDto>>.Success(productsDto);
+            var result = PagedResultHelper.Create(productsDto, totalRecords, filterProductDto);
+            return Result<PagedResult<GetProductDto>>.Success(result);
         }
 
         public async Task<Result<GetProductDto>> GetProductAsync(int id)
