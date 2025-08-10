@@ -8,7 +8,7 @@ namespace ECommerceApi.Extensions
         {
             services.AddRateLimiter(options =>
             {
-                options.AddPolicy("general", context =>
+                options.AddPolicy(Constants.RateLimitGeneral, context =>
                 {
                     return RateLimitPartition.GetFixedWindowLimiter(
                         partitionKey: context.Connection.RemoteIpAddress?.ToString() ?? "unknown",
@@ -19,7 +19,7 @@ namespace ECommerceApi.Extensions
                         });
                 });
 
-                options.AddPolicy("strict", context =>
+                options.AddPolicy(Constants.RateLimitStrict, context =>
                 {
                     return RateLimitPartition.GetFixedWindowLimiter(
                         partitionKey: context.Connection.RemoteIpAddress?.ToString() ?? "unknown",

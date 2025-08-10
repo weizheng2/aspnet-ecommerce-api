@@ -27,7 +27,7 @@ namespace ECommerceApi.Services
 
         public async Task<User?> GetUser()
         {
-            var emailClaim = _contextAccessor.HttpContext!.User.Claims.Where(x => x.Type == "email").FirstOrDefault();
+            var emailClaim = _contextAccessor.HttpContext!.User.Claims.Where(x => x.Type == Constants.ClaimTypeEmail).FirstOrDefault();
 
             if (emailClaim is null)
                 return null;
@@ -41,7 +41,7 @@ namespace ECommerceApi.Services
              // Add claims
             var claims = new List<Claim>
             {
-                new Claim("email", credentialsDto.Email),
+                new Claim(Constants.ClaimTypeEmail, credentialsDto.Email),
             };
 
             var user = await _userManager.FindByEmailAsync(credentialsDto.Email);
@@ -125,11 +125,11 @@ namespace ECommerceApi.Services
             if (user is null)
                 return Result.Failure(ResultErrorType.NotFound);
 
-            var existingClaims  = await _userManager.GetClaimsAsync(user);
-            if (existingClaims.Any(c => c.Type == "isAdmin" && c.Value == "true"))
+            var existingClaims = await _userManager.GetClaimsAsync(user);
+            if (existingClaims.Any(c => c.Type == Constants.PolicyIsAdmin && c.Value == "true"))
                 return Result.Failure(ResultErrorType.ValidationError, "User is already an admin");
 
-            var claim = new Claim("isAdmin", "true");
+            var claim = new Claim(Constants.PolicyIsAdmin, "true");
             var result = await _userManager.AddClaimAsync(user, claim);
                 
             if (!result.Succeeded)

@@ -19,7 +19,7 @@ namespace ECommerceApi.Controllers
             _userServices = userServices;
         }
 
-        [EnableRateLimiting("general")]
+        [EnableRateLimiting(Constants.RateLimitGeneral)]
         [HttpPost("register")]
         public async Task<ActionResult<AuthenticationResponseDto>> Register(UserCredentialsDto credentialsDto)
         {
@@ -37,7 +37,7 @@ namespace ECommerceApi.Controllers
             }
         }
 
-        [EnableRateLimiting("strict")]
+        [EnableRateLimiting(Constants.RateLimitStrict)]
         [HttpPost("login")]
         public async Task<ActionResult<AuthenticationResponseDto>> Login(UserCredentialsDto credentialsDto)
         {
@@ -55,7 +55,7 @@ namespace ECommerceApi.Controllers
             }
         }
 
-        [EnableRateLimiting("general")]
+        [EnableRateLimiting(Constants.RateLimitGeneral)]
         [HttpGet("update-token")]
         [Authorize]
         public async Task<ActionResult<AuthenticationResponseDto>> UpdateToken()
@@ -72,7 +72,7 @@ namespace ECommerceApi.Controllers
         }
 
         [HttpPost("make-admin")]
-        [Authorize(Policy = "isAdmin")]
+        [Authorize(Policy = Constants.PolicyIsAdmin)]
         public async Task<ActionResult> MakeAdmin(EditClaimDto editClaimDto)
         {
             if (!ModelState.IsValid)
