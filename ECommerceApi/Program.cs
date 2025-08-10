@@ -21,7 +21,6 @@ builder.Services.AddAuthorizationBasedOnPolicy();
 
 builder.Services.AddCustomApiVersioning();
 builder.Services.AddCustomSwagger();
-builder.Services.AddCustomIdentityOptions();
 
 // Database
 builder.Services.AddDbContext<ApplicationDbContext>(options => options.UseSqlServer(builder.Configuration.GetConnectionString("DefaultConnection")));
@@ -32,7 +31,7 @@ builder.Services.AddScoped<UserManager<User>>();
 builder.Services.AddScoped<SignInManager<User>>();
 
 // Services 
-builder.Services.AddTransient<IUserServices, UserServices>();
+builder.Services.AddTransient<IUserService, UserService>();
 builder.Services.AddTransient<IProductService, ProductService>();
 // builder.Services.AddTransient<IArchiveStorage, ArchiveStorageAzure>();
 

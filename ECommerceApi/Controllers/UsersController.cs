@@ -12,9 +12,9 @@ namespace ECommerceApi.Controllers
     [ApiController, Route("api/v{version:apiVersion}/users")]
     public class UsersController : ControllerBase
     {
-        private readonly IUserServices _userServices;
+        private readonly IUserService _userServices;
 
-        public UsersController(IUserServices userServices)
+        public UsersController(IUserService userServices)
         {
             _userServices = userServices;
         }
@@ -23,36 +23,22 @@ namespace ECommerceApi.Controllers
         [HttpPost("register")]
         public async Task<ActionResult<AuthenticationResponseDto>> Register(UserCredentialsDto credentialsDto)
         {
-            if (!ModelState.IsValid)
-                return ValidationProblem(ModelState);
-
             var result = await _userServices.Register(credentialsDto);
             if (result.IsSuccess)
                 return result.Data;
 
-            switch (result.ErrorType)
-            {
-                case ResultErrorType.ValidationError: return ValidationProblem(result.ErrorMessage);
-                default: return BadRequest(result.ErrorMessage);
-            }
+            return BadRequest(result.ErrorMessage);
         }
 
         [EnableRateLimiting(Constants.RateLimitStrict)]
         [HttpPost("login")]
         public async Task<ActionResult<AuthenticationResponseDto>> Login(UserCredentialsDto credentialsDto)
         {
-            if (!ModelState.IsValid)
-                return ValidationProblem(ModelState);
-
             var result = await _userServices.Login(credentialsDto);
             if (result.IsSuccess)
                 return result.Data;
-            
-            switch (result.ErrorType)
-            {
-                case ResultErrorType.ValidationError: return ValidationProblem(result.ErrorMessage);
-                default: return BadRequest(result.ErrorMessage);
-            }
+
+            return BadRequest(result.ErrorMessage);
         }
 
         [EnableRateLimiting(Constants.RateLimitGeneral)]
@@ -71,13 +57,11 @@ namespace ECommerceApi.Controllers
             }
         }
 
+        [EnableRateLimiting(Constants.RateLimitStrict)]
         [HttpPost("make-admin")]
         [Authorize(Policy = Constants.PolicyIsAdmin)]
         public async Task<ActionResult> MakeAdmin(EditClaimDto editClaimDto)
         {
-            if (!ModelState.IsValid)
-                return ValidationProblem(ModelState);
-
             var result = await _userServices.MakeAdmin(editClaimDto);
             if (result.IsSuccess)
                 return NoContent();

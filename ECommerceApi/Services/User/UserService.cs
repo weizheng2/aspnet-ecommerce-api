@@ -9,14 +9,14 @@ using System.IdentityModel.Tokens.Jwt;
 
 namespace ECommerceApi.Services
 {
-    public class UserServices : IUserServices
+    public class UserService : IUserService
     {
         private readonly IConfiguration _configuration;
         private readonly UserManager<User> _userManager;
         private readonly SignInManager<User> _signInManager;
         private readonly IHttpContextAccessor _contextAccessor;
 
-        public UserServices(IConfiguration configuration, UserManager<User> userManager,
+        public UserService(IConfiguration configuration, UserManager<User> userManager,
             SignInManager<User> signInManager, IHttpContextAccessor contextAccessor)
         {
             _userManager = userManager;
@@ -36,15 +36,15 @@ namespace ECommerceApi.Services
             return await _userManager.FindByEmailAsync(email);
         }
 
-        private async Task<AuthenticationResponseDto> CreateToken(UserCredentialsDto credentialsDto)
+        private async Task<AuthenticationResponseDto> CreateToken(string email)
         {
              // Add claims
             var claims = new List<Claim>
             {
-                new Claim(Constants.ClaimTypeEmail, credentialsDto.Email),
+                new Claim(Constants.ClaimTypeEmail, email),
             };
 
-            var user = await _userManager.FindByEmailAsync(credentialsDto.Email);
+            var user = await _userManager.FindByEmailAsync(email);
             var existingClaims = await _userManager.GetClaimsAsync(user!);
 
             claims.AddRange(existingClaims);
@@ -76,35 +76,42 @@ namespace ECommerceApi.Services
         {
             var user = new User
             {
-                UserName = credentialsDto.Email
+                UserName = credentialsDto.Email,
+                Email = credentialsDto.Email
             };
 
             var result = await _userManager.CreateAsync(user, credentialsDto.Password!);
             if (result.Succeeded)
             {
-                var token = await CreateToken(credentialsDto);
+                var token = await CreateToken(credentialsDto.Email);
                 return Result<AuthenticationResponseDto>.Success(token);
             }
-            else
-            {
-                return Result<AuthenticationResponseDto>.Failure(ResultErrorType.ValidationError, "Incorrect Registration");
-            }
+        
+            var passwordErrors = result.Errors
+                .Where(e => e.Code.StartsWith("Password"))
+                .Select(e => e.Description)
+                .ToList();
+
+            if (passwordErrors.Count != 0)
+                return Result<AuthenticationResponseDto>.Failure(ResultErrorType.BadRequest, string.Join("\n", passwordErrors));
+
+            return Result<AuthenticationResponseDto>.Failure(ResultErrorType.BadRequest, "Incorrect Registration");        
         }
 
         public async Task<Result<AuthenticationResponseDto>> Login(UserCredentialsDto credentialsDto)
         {
             var user = await _userManager.FindByEmailAsync(credentialsDto.Email);
             if (user is null)
-                return Result<AuthenticationResponseDto>.Failure(ResultErrorType.ValidationError, "Incorrect Login");
+                return Result<AuthenticationResponseDto>.Failure(ResultErrorType.BadRequest, "Incorrect Login");
      
             var result = await _signInManager.CheckPasswordSignInAsync(user, credentialsDto.Password!, lockoutOnFailure: false);
             if (result.Succeeded)
             {
-                var token = await CreateToken(credentialsDto);
+                var token = await CreateToken(credentialsDto.Email);
                 return Result<AuthenticationResponseDto>.Success(token);
             }
 
-            return Result<AuthenticationResponseDto>.Failure(ResultErrorType.ValidationError, "Incorrect Login");
+            return Result<AuthenticationResponseDto>.Failure(ResultErrorType.BadRequest, "Incorrect Login");
         }
 
         public async Task<Result<AuthenticationResponseDto>> UpdateToken()
@@ -113,8 +120,7 @@ namespace ECommerceApi.Services
             if (user is null)
                 return Result<AuthenticationResponseDto>.Failure(ResultErrorType.NotFound);
 
-            var userCredentialsDto = new UserCredentialsDto { Email = user.Email! };
-            var token = await CreateToken(userCredentialsDto);
+            var token = await CreateToken(user.Email!);
 
             return Result<AuthenticationResponseDto>.Success(token);
         }
@@ -127,13 +133,13 @@ namespace ECommerceApi.Services
 
             var existingClaims = await _userManager.GetClaimsAsync(user);
             if (existingClaims.Any(c => c.Type == Constants.PolicyIsAdmin && c.Value == "true"))
-                return Result.Failure(ResultErrorType.ValidationError, "User is already an admin");
+                return Result.Failure(ResultErrorType.BadRequest, "User is already an admin");
 
             var claim = new Claim(Constants.PolicyIsAdmin, "true");
             var result = await _userManager.AddClaimAsync(user, claim);
                 
             if (!result.Succeeded)
-                return Result.Failure(ResultErrorType.ValidationError, "Failed to add admin claim");
+                return Result.Failure(ResultErrorType.BadRequest, "Failed to make admin");
 
             return Result.Success();
         }

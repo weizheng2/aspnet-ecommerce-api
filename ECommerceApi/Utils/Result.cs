@@ -5,7 +5,6 @@ namespace ECommerceApi.Utils
         None,
         NotFound,
         BadRequest,
-        ValidationError,
         ServerError
     }
 

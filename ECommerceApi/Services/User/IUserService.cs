@@ -4,7 +4,7 @@ using ECommerceApi.Utils;
 
 namespace ECommerceApi.Services
 {
-    public interface IUserServices
+    public interface IUserService
     {
         Task<User?> GetUser();
         Task<Result<AuthenticationResponseDto>> Register(UserCredentialsDto credentialsDto);
