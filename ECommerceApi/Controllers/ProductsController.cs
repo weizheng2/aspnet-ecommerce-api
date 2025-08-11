@@ -5,9 +5,8 @@ using ECommerceApi.DTOs;
 using ECommerceApi.Services;
 using ECommerceApi.Utils;
 using Microsoft.AspNetCore.Authorization;
-using ECommerceApi;
 
-namespace LibraryApi.Controllers
+namespace ECommerceApi.Controllers
 {
     [ApiVersion("1.0")]
     [EnableRateLimiting(Constants.RateLimitGeneral)]

@@ -33,6 +33,8 @@ builder.Services.AddScoped<SignInManager<User>>();
 // Services 
 builder.Services.AddTransient<IUserService, UserService>();
 builder.Services.AddTransient<IProductService, ProductService>();
+builder.Services.AddTransient<ICartService, CartService>();
+
 // builder.Services.AddTransient<IArchiveStorage, ArchiveStorageAzure>();
 
 var app = builder.Build();
