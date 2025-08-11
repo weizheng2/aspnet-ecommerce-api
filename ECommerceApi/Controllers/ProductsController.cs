@@ -4,11 +4,13 @@ using Microsoft.AspNetCore.RateLimiting;
 using ECommerceApi.DTOs;
 using ECommerceApi.Services;
 using ECommerceApi.Utils;
+using Microsoft.AspNetCore.Authorization;
+using ECommerceApi;
 
 namespace LibraryApi.Controllers
 {
     [ApiVersion("1.0")]
-    [EnableRateLimiting("general")]
+    [EnableRateLimiting(Constants.RateLimitGeneral)]
     [ControllerName("Products"), Tags("Products")]
     [ApiController, Route("api/v{version:apiVersion}/products")]
     public class ProductsController : ControllerBase
@@ -42,6 +44,7 @@ namespace LibraryApi.Controllers
         }
 
         [HttpPost]
+        [Authorize(Policy = Constants.PolicyIsAdmin)]
         public async Task<ActionResult> CreateProduct(CreateProductDto createProductDto)
         {
             var result = await _productService.CreateProductAsync(createProductDto);
@@ -57,8 +60,9 @@ namespace LibraryApi.Controllers
                 default: return BadRequest(result.ErrorMessage);
             }
         }
-        
+
         [HttpPut("{id}")]
+        [Authorize(Policy = Constants.PolicyIsAdmin)]
         public async Task<ActionResult> UpdateProduct(int id, UpdateProductDto updateProductDto)
         {
             var result = await _productService.UpdateProductAsync(id, updateProductDto);
@@ -71,14 +75,15 @@ namespace LibraryApi.Controllers
                 default: return BadRequest(result.ErrorMessage);
             }
         }
-       
+
         [HttpDelete("{id}")]
+        [Authorize(Policy = Constants.PolicyIsAdmin)]
         public async Task<ActionResult> DeleteProduct(int id)
         {
             var result = await _productService.DeleteProductAsync(id);
             if (result.IsSuccess)
                 return NoContent();
-     
+
             switch (result.ErrorType)
             {
                 case ResultErrorType.NotFound: return NotFound();
