@@ -9,6 +9,7 @@ namespace ECommerceApi.Services
         Task<Result> AddItemAsync(AddCartItemDto addCartItemDto);
         Task<Result> UpdateItemAsync(int cartItemId, UpdateCartItemDto updateCartItemDto);
         Task<Result> ClearCartAsync();
+        Task<Result<decimal>> GetCartTotalAmountAsync();
 
     }
 }

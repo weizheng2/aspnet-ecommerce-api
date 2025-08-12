@@ -64,7 +64,7 @@ namespace ECommerceApi.Services
 
             var cart = await GetOrCreateCartAsync(user.Id);
 
-             // Find existing item
+            // Find existing item
             var existingItem = cart!.Items.FirstOrDefault(item => item.ProductId == addCartItemDto.ProductId);
             if (existingItem != null)
             {
@@ -92,7 +92,7 @@ namespace ECommerceApi.Services
 
             // Find Cart
             var cart = await GetOrCreateCartAsync(user.Id, false);
-    
+
             if (cart is null)
                 return Result.Failure(ResultErrorType.NotFound, "Cart not found");
 
@@ -105,7 +105,7 @@ namespace ECommerceApi.Services
                 cart.Items.Remove(cartItem);
             else
                 cartItem.Quantity = updateCartItemDto.Quantity;
-    
+
             await _context.SaveChangesAsync();
             return Result.Success();
         }
@@ -125,7 +125,21 @@ namespace ECommerceApi.Services
             await _context.SaveChangesAsync();
             return Result.Success();
         }
+
+        public async Task<Result<decimal>> GetCartTotalAmountAsync()
+        {
+            var cartResult = await GetCartAsync();
+            if (!cartResult.IsSuccess)
+                return Result<decimal>.Failure(ResultErrorType.NotFound, "Cart not found");
+
+            var cart = cartResult.Data;
+            if (cart.Items.Count == 0)
+                return Result<decimal>.Failure(ResultErrorType.BadRequest, "Cart is empty");
+
+            return Result<decimal>.Success(cart.TotalPrice);
+        }
     }
+    
 
 }
 

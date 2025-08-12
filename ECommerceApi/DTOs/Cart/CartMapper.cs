@@ -18,6 +18,7 @@ namespace ECommerceApi.DTOs
             {
                 Id = cartItem.Id,
                 ProductId = cartItem.ProductId,
+                Product = cartItem.Product,
                 Quantity = cartItem.Quantity
             };
         }

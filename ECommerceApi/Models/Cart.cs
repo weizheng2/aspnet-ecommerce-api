@@ -10,8 +10,9 @@ namespace ECommerceApi.Models
         public required string UserId { get; set; }
         public User? User { get; set; }
 
-        public List<CartItem> Items { get; set; } =  [];
-
+        public List<CartItem> Items { get; set; } = [];
+        public decimal TotalPrice => Items.Sum(item => item.TotalPrice);
+        
     }
 
 }

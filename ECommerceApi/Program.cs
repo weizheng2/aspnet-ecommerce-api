@@ -5,6 +5,7 @@ using ECommerceApi.Services;
 using ECommerceApi.Swagger;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.EntityFrameworkCore;
+using Stripe;
 
 var builder = WebApplication.CreateBuilder(args);
 
@@ -21,6 +22,7 @@ builder.Services.AddAuthorizationBasedOnPolicy();
 
 builder.Services.AddCustomApiVersioning();
 builder.Services.AddCustomSwagger();
+StripeConfiguration.ApiKey = builder.Configuration["Stripe:SecretKey"];
 
 // Database
 builder.Services.AddDbContext<ApplicationDbContext>(options => options.UseSqlServer(builder.Configuration.GetConnectionString("DefaultConnection")));
@@ -32,10 +34,9 @@ builder.Services.AddScoped<SignInManager<User>>();
 
 // Services 
 builder.Services.AddTransient<IUserService, UserService>();
-builder.Services.AddTransient<IProductService, ProductService>();
+builder.Services.AddTransient<IProductService, ECommerceApi.Services.ProductService>();
 builder.Services.AddTransient<ICartService, CartService>();
-
-// builder.Services.AddTransient<IArchiveStorage, ArchiveStorageAzure>();
+builder.Services.AddTransient<IPaymentService, StripePaymentService>();
 
 var app = builder.Build();
 
