@@ -44,15 +44,18 @@ namespace ECommerceApi.Controllers
         }
 
         [HttpGet("payment-success")]
-        [Authorize]
-        public async Task<IActionResult> OnPaymentSuccess([FromQuery] string session_id)
+        [AllowAnonymous]
+        public async Task<ActionResult> OnPaymentSuccess([FromQuery] string session_id)
         {
             var result = await _paymentService.OnPaymentSuccess(session_id);
-            return Content(result.Data);     
+            if (result.IsSuccess)
+                return Content(result.Data);     
+            
+            return BadRequest(result.ErrorMessage); 
         }
 
         [HttpGet("payment-cancelled")]
-        [Authorize]
+        [AllowAnonymous]
         public ActionResult OnPaymentCancelled()
         {
             return Content($"Payment cancelled!");

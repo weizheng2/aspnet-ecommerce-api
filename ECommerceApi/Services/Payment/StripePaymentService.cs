@@ -1,4 +1,3 @@
-using ECommerceApi.Models;
 using ECommerceApi.Utils;
 using Stripe;
 using Stripe.Checkout;
@@ -53,7 +52,7 @@ namespace ECommerceApi.Services
 
                 Metadata = new Dictionary<string, string>
                 {
-                    { "user_id", user.Id }
+                    { "user_name", user.UserName! }
                 }
             };
 
@@ -72,16 +71,24 @@ namespace ECommerceApi.Services
 
         public async Task<Result<string>> OnPaymentSuccess(string sessionId)
         {
-            var service = new SessionService();
-            var session = await service.GetAsync(sessionId);
+            try 
+            {
+                var sessionService = new SessionService();
+                var session = await sessionService.GetAsync(sessionId);
 
-            string result = "Payment successful!";
-            if (session.PaymentStatus != "paid")
-                result = "Payment not confirmed";
+                string userName = "";
+                if (session.Metadata.TryGetValue("user_name", out string? value))
+                    userName = value;
 
-            return Result<string>.Success(result);
+                string result = $"Payment Success, {userName}!";
+                return Result<string>.Success(result);
+            }
+            catch 
+            {
+                return Result<string>.Failure(ResultErrorType.BadRequest, "Invalid session");
+            }
         }
-        
+    
     }
 
 }
