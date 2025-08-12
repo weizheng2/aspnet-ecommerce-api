@@ -4,6 +4,7 @@ using Microsoft.AspNetCore.RateLimiting;
 using ECommerceApi.DTOs;
 using ECommerceApi.Services;
 using ECommerceApi.Utils;
+using Microsoft.AspNetCore.Authorization;
 
 namespace ECommerceApi.Controllers
 {
@@ -21,6 +22,7 @@ namespace ECommerceApi.Controllers
         }
 
         [HttpGet]
+        [Authorize]
         public async Task<ActionResult<GetCartDto>> GetCart()
         {
             var result = await _cartService.GetCartAsync();
@@ -28,21 +30,33 @@ namespace ECommerceApi.Controllers
             if (result.IsSuccess)
                 return Ok(result.Data);
 
-            return NotFound(); 
+            return NotFound();
         }
 
         [HttpPost]
+        [Authorize]
         public async Task<ActionResult> AddItemToCart(AddCartItemDto addCartItemDto)
         {
             var result = await _cartService.AddItemAsync(addCartItemDto);
             if (result.IsSuccess)
                 return Ok();
-    
+
             switch (result.ErrorType)
             {
                 case ResultErrorType.NotFound: return NotFound(result.ErrorMessage);
                 default: return BadRequest(result.ErrorMessage);
             }
+        }
+
+        [HttpPut("{cartItemId}")]
+        [Authorize]
+        public async Task<ActionResult> UpdateCartItem(int cartItemId, UpdateCartItemDto updateCartItemDto)
+        {
+            var result = await _cartService.UpdateItemAsync(cartItemId, updateCartItemDto);
+            if (result.IsSuccess)
+                return Ok();
+
+            return NotFound(result.ErrorMessage);
         }
     }
 }

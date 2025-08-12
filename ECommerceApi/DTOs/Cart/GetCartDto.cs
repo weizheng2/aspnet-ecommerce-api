@@ -4,7 +4,7 @@ namespace ECommerceApi.DTOs
 {
     public class GetCartDto
     {
-        public List<CartItem> Items { get; set; } = [];
+        public List<GetCartItemDto> Items { get; set; } = [];
     }
 
 }

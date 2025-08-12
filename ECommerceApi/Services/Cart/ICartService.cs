@@ -7,7 +7,7 @@ namespace ECommerceApi.Services
     {
         Task<Result<GetCartDto>> GetCartAsync();
         Task<Result> AddItemAsync(AddCartItemDto addCartItemDto);
-        // Task<Result> UpdateCartAsync(int id, UpdateProductDto productDto);
+        Task<Result> UpdateItemAsync(int cartItemId, UpdateCartItemDto updateCartItemDto);
         // Task<Result> RemoveCartItemAsync(int id);
         // Task<Result> ClearCartAsync(int id);
 
