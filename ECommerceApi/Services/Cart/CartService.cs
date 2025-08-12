@@ -109,6 +109,22 @@ namespace ECommerceApi.Services
             await _context.SaveChangesAsync();
             return Result.Success();
         }
+
+        public async Task<Result> ClearCartAsync()
+        {
+            var user = await _userService.GetUser();
+            if (user is null)
+                return Result.Failure(ResultErrorType.NotFound, "User not found");
+
+            // Find Cart
+            var cart = await GetOrCreateCartAsync(user.Id, false);
+            if (cart is null)
+                return Result.Failure(ResultErrorType.NotFound, "Cart not found");
+
+            cart.Items.Clear();
+            await _context.SaveChangesAsync();
+            return Result.Success();
+        }
     }
 
 }

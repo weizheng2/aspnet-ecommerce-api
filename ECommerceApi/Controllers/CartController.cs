@@ -54,7 +54,18 @@ namespace ECommerceApi.Controllers
         {
             var result = await _cartService.UpdateItemAsync(cartItemId, updateCartItemDto);
             if (result.IsSuccess)
-                return Ok();
+                return Ok(new { cartItemId, quantity = updateCartItemDto.Quantity });
+
+            return NotFound(result.ErrorMessage);
+        }
+
+        [HttpDelete("clear")]
+        [Authorize]
+        public async Task<ActionResult> ClearCart()
+        {
+            var result = await _cartService.ClearCartAsync();
+            if (result.IsSuccess)
+                return NoContent();
 
             return NotFound(result.ErrorMessage);
         }
