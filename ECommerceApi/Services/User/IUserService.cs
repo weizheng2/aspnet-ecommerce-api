@@ -6,6 +6,7 @@ namespace ECommerceApi.Services
 {
     public interface IUserService
     {
+        Task<User?> GetUserById(string userId);
         Task<User?> GetUser();
         Task<Result<AuthenticationResponseDto>> Register(UserCredentialsDto credentialsDto);
         Task<Result<AuthenticationResponseDto>> Login(UserCredentialsDto credentialsDto);

@@ -25,6 +25,7 @@ namespace ECommerceApi.Services
             _contextAccessor = contextAccessor;
         }
 
+        public async Task<User?> GetUserById(string userId) => await _userManager.FindByIdAsync(userId);
         public async Task<User?> GetUser()
         {
             var emailClaim = _contextAccessor.HttpContext!.User.Claims.Where(x => x.Type == Constants.ClaimTypeEmail).FirstOrDefault();

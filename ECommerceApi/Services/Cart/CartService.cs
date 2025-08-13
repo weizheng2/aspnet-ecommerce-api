@@ -110,9 +110,14 @@ namespace ECommerceApi.Services
             return Result.Success();
         }
 
-        public async Task<Result> ClearCartAsync()
+        public async Task<Result> ClearCartAsync(string userId = null)
         {
-            var user = await _userService.GetUser();
+            User user;
+            if (!string.IsNullOrEmpty(userId))
+                user = await _userService.GetUserById(userId);
+            else
+                user = await _userService.GetUser();
+    
             if (user is null)
                 return Result.Failure(ResultErrorType.NotFound, "User not found");
 
