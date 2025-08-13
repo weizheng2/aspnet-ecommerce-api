@@ -1,5 +1,3 @@
-using System.ComponentModel.DataAnnotations;
-
 namespace ECommerceApi.Models
 {
     public class OrderItem

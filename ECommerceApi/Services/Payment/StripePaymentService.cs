@@ -1,4 +1,3 @@
-using System.Text.Json;
 using ECommerceApi.Data;
 using ECommerceApi.Models;
 using ECommerceApi.Utils;
@@ -38,7 +37,7 @@ namespace ECommerceApi.Services
             {
                 PriceData = new SessionLineItemPriceDataOptions
                 {
-                    Currency = "eur",
+                    Currency = "EUR",
                     UnitAmount = (long)(item.Product!.Price * 100),
                     ProductData = new SessionLineItemPriceDataProductDataOptions
                     {
