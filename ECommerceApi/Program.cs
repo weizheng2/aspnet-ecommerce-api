@@ -33,10 +33,10 @@ builder.Services.AddScoped<UserManager<User>>();
 builder.Services.AddScoped<SignInManager<User>>();
 
 // Services 
-builder.Services.AddTransient<IUserService, UserService>();
-builder.Services.AddTransient<IProductService, ECommerceApi.Services.ProductService>();
-builder.Services.AddTransient<ICartService, CartService>();
-builder.Services.AddTransient<IPaymentService, StripePaymentService>();
+builder.Services.AddScoped<IUserService, UserService>();
+builder.Services.AddScoped<IProductService, ECommerceApi.Services.ProductService>();
+builder.Services.AddScoped<ICartService, CartService>();
+builder.Services.AddScoped<IPaymentService, StripePaymentService>();
 
 var app = builder.Build();
 

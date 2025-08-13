@@ -6,6 +6,7 @@ namespace ECommerceApi.Services
     {
         Task<Result<string>> CreateCheckoutSession(string successUrl, string cancelUrl);
         Task<Result<string>> OnPaymentSuccess(string paymentId);
+        Task<Result> OnWebhookReceived(string jsonData, string signature);
 
     }
 }

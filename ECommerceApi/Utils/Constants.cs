@@ -7,5 +7,8 @@ namespace ECommerceApi
 
         public const string RateLimitGeneral = "rateLimitGeneral";
         public const string RateLimitStrict = "rateLimitStrict";
+
+        public const string PaymentMethodStripe = "Stripe";
+
     }
 }

@@ -49,9 +49,9 @@ namespace ECommerceApi.Controllers
         {
             var result = await _paymentService.OnPaymentSuccess(session_id);
             if (result.IsSuccess)
-                return Content(result.Data);     
-            
-            return BadRequest(result.ErrorMessage); 
+                return Content(result.Data);
+
+            return BadRequest(result.ErrorMessage);
         }
 
         [HttpGet("payment-cancelled")]
@@ -60,12 +60,24 @@ namespace ECommerceApi.Controllers
         {
             return Content($"Payment cancelled!");
         }
-        
-        // Add when the app is hosted
-        // [HttpPost("webhook")]
-        // public async Task<IActionResult> StripeWebhook()
 
-        // }
+        [HttpPost("webhook")]
+        public async Task<IActionResult> OnWebhookReceived()
+        {
+            var json = await new StreamReader(HttpContext.Request.Body).ReadToEndAsync();
+            string signature = Request.Headers["Stripe-Signature"];
+
+            var result = await _paymentService.OnWebhookReceived(json, signature);
+            if (result.IsSuccess)
+                return Ok();
+
+            switch (result.ErrorType)
+            {
+                case ResultErrorType.ServerError: return StatusCode(500);
+                default: return BadRequest(result.ErrorMessage);
+            }
+        }
+
     }
 }
 
