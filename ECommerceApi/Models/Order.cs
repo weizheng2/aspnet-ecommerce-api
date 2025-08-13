@@ -12,7 +12,9 @@ namespace ECommerceApi.Models
 
         public List<OrderItem> Items { get; set; } = [];
 
-        public decimal TotalAmount => Items.Sum(item => item.TotalPrice);
+        public decimal TotalAmount { get; set; } 
+        public string? Currency { get; set; } 
+
         public DateTime CreatedAt { get; set; } = DateTime.UtcNow;
         public DateTime UpdatedAt { get; set; } = DateTime.UtcNow;
 
