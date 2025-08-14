@@ -94,4 +94,4 @@ Access the live API via Swagger (may take a few seconds to start if idle):
    ConnectionStrings__DefaultConnection (Database)
    Stripe__SecretKey 
    Stripe__EndPointSecret
-   AppSettings__BaseUrl (Used for Stripe success and cancel url)
+   AppSettings__BaseUrl (For Stripe success and cancel url)
