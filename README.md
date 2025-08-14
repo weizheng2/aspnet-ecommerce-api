@@ -1,5 +1,5 @@
 # ASP.NET Ecommerce API
-A RESTful ASP.NET Core Web API for an e-commerce platform, designed to handle products, carts, orders, payments, and user management with secure authentication and role-based authorization.
+A RESTful ASP.NET Core Web API for an e-commerce platform, designed to handle products, carts, orders, payments, and user management with authentication and role-based authorization.
 
 ## 🚀 Key Features
 
@@ -8,7 +8,7 @@ A RESTful ASP.NET Core Web API for an e-commerce platform, designed to handle pr
 - **Orders:** Manage user orders and retrieve order history and details.  
 - **Payment Integration:** Stripe checkout session and webhook handling for verification and order creation.  
 - **User Management:** JWT authentication and role-based authorization for Admin and User access.  
-- **Additional Features:** API versioning for maintainability and rate limiting to manage traffic.
+- **Additional Features:** Pagination, API versioning for maintainability and rate limiting to manage traffic.
 
 
 ## 🛠️ Technologies Used
@@ -87,11 +87,11 @@ Access the live API via Swagger (may take a few seconds to start if idle):
 
 1. **Clone the repository**
   ```bash
-   git clone https://github.com/yourusername/aspnet-ecommerce-api.git
+   git clone https://github.com/weizheng2/aspnet-ecommerce-api.git
   ```
 2. **Set up keys in appsettings.Development.json or appsettings.json**
   ```bash
-   ConnectionStrings__DefaultConnection
-   Stripe__SecretKey
+   ConnectionStrings__DefaultConnection (Database)
+   Stripe__SecretKey 
    Stripe__EndPointSecret
-   AppSettings__BaseUrl
+   AppSettings__BaseUrl (Used for Stripe success and cancel url)
