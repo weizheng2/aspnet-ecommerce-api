@@ -1,6 +1,0 @@
-@aspnet_ecommerce_api_HostAddress = http://localhost:5137
-
-GET {{aspnet_ecommerce_api_HostAddress}}/weatherforecast/
-Accept: application/json
-
-###
