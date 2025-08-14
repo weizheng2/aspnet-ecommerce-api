@@ -10,7 +10,7 @@ namespace ECommerceApi.Services
         Task<User?> GetUser();
         Task<Result<AuthenticationResponseDto>> Register(UserCredentialsDto credentialsDto);
         Task<Result<AuthenticationResponseDto>> Login(UserCredentialsDto credentialsDto);
-        Task<Result<AuthenticationResponseDto>> UpdateToken();
+        Task<Result<AuthenticationResponseDto>> RefreshToken();
         Task<Result> MakeAdmin(EditClaimDto editClaimDto);
     }
 }

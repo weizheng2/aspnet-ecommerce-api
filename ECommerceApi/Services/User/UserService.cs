@@ -115,7 +115,7 @@ namespace ECommerceApi.Services
             return Result<AuthenticationResponseDto>.Failure(ResultErrorType.BadRequest, "Incorrect Login");
         }
 
-        public async Task<Result<AuthenticationResponseDto>> UpdateToken()
+        public async Task<Result<AuthenticationResponseDto>> RefreshToken()
         {
             var user = await GetUser();
             if (user is null)

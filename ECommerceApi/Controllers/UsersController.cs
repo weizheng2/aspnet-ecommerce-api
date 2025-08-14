@@ -42,11 +42,11 @@ namespace ECommerceApi.Controllers
         }
 
         [EnableRateLimiting(Constants.RateLimitGeneral)]
-        [HttpGet("update-token")]
+        [HttpPost("refresh-token")] 
         [Authorize]
-        public async Task<ActionResult<AuthenticationResponseDto>> UpdateToken()
+        public async Task<ActionResult<AuthenticationResponseDto>> RefreshToken()
         {
-            var result = await _userServices.UpdateToken();
+            var result = await _userServices.RefreshToken();
             if (result.IsSuccess)
                 return result.Data;
 

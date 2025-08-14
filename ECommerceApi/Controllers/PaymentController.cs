@@ -62,6 +62,7 @@ namespace ECommerceApi.Controllers
         }
 
         [HttpPost("webhook")]
+        [AllowAnonymous]
         public async Task<IActionResult> OnWebhookReceived()
         {
             var json = await new StreamReader(HttpContext.Request.Body).ReadToEndAsync();
