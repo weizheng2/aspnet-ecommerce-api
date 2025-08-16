@@ -8,6 +8,7 @@ namespace ECommerceApi.Services
     {
         Task<User?> GetUserById(string userId);
         Task<User?> GetUser();
+        Task<Result<User>> GetValidatedUserAsync(string? userId = null); 
         Task<Result<AuthenticationResponseDto>> Register(UserCredentialsDto credentialsDto);
         Task<Result<AuthenticationResponseDto>> Login(UserCredentialsDto credentialsDto);
         Task<Result<AuthenticationResponseDto>> RefreshToken();

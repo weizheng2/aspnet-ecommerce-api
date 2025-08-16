@@ -1,32 +1,27 @@
-using ECommerceApi.Data;
 using ECommerceApi.DTOs;
 using ECommerceApi.Models;
+using ECommerceApi.Repositories;
 using ECommerceApi.Utils;
-using Microsoft.EntityFrameworkCore;
 
 namespace ECommerceApi.Services
 {
     public class CartService : ICartService
     {
-        private readonly ApplicationDbContext _context;
+        private readonly IUnitOfWork _unitOfWork;
         private readonly IUserService _userService;
-        public CartService(ApplicationDbContext context, IUserService userService)
+        public CartService(IUnitOfWork unitOfWork, IUserService userService)
         {
-            _context = context;
+            _unitOfWork = unitOfWork;
             _userService = userService;
         }
-
-        private async Task<Cart?> GetOrCreateCartAsync(string userId, bool createIfNotExists = true)
+        
+        private async Task<Cart> GetOrCreateCartAsync(string userId)
         {
-            var cart = await _context.Carts
-                .Include(c => c.Items)
-                .FirstOrDefaultAsync(c => c.UserId == userId);
-
-            if (cart is null && createIfNotExists)
+            var cart = await _unitOfWork.Carts.GetCartWithItems(userId);
+            if (cart is null)
             {
                 cart = new Cart { UserId = userId };
-                _context.Carts.Add(cart);
-                await _context.SaveChangesAsync();
+                _unitOfWork.Carts.Add(cart);
             }
 
             return cart;
@@ -34,15 +29,12 @@ namespace ECommerceApi.Services
 
         public async Task<Result<GetCartDto>> GetCartAsync()
         {
-            var user = await _userService.GetUser();
-            if (user is null)
-                return Result<GetCartDto>.Failure(ResultErrorType.NotFound);
+            var userResult = await _userService.GetValidatedUserAsync();
+            if (!userResult.IsSuccess)
+                return Result<GetCartDto>.Failure(ResultErrorType.NotFound, userResult.ErrorMessage);
+            var user = userResult.Data;
 
-            var cart = await _context.Carts
-               .Include(c => c.Items)
-                   .ThenInclude(ci => ci.Product)
-               .FirstOrDefaultAsync(c => c.UserId == user.Id);
-
+            var cart = await _unitOfWork.Carts.GetCartWithItemsAndProducts(user.Id);
             if (cart is null)
             {
                 var emptyCart = new GetCartDto { Items = [] };
@@ -54,18 +46,19 @@ namespace ECommerceApi.Services
 
         public async Task<Result> AddItemAsync(AddCartItemDto addCartItemDto)
         {
-            var user = await _userService.GetUser();
-            if (user is null)
-                return Result.Failure(ResultErrorType.NotFound, "User not found");
+            var userResult = await _userService.GetValidatedUserAsync();
+            if (!userResult.IsSuccess)
+                return Result.Failure(ResultErrorType.NotFound, userResult.ErrorMessage);
+            var user = userResult.Data;
 
-            var product = await _context.Products.FindAsync(addCartItemDto.ProductId);
+            var product = await _unitOfWork.Products.GetByIdAsync(addCartItemDto.ProductId);
             if (product is null)
                 return Result.Failure(ResultErrorType.NotFound, "Product not found");
 
             var cart = await GetOrCreateCartAsync(user.Id);
 
             // Find existing item
-            var existingItem = cart!.Items.FirstOrDefault(item => item.ProductId == addCartItemDto.ProductId);
+            var existingItem = cart.Items.FirstOrDefault(item => item.ProductId == addCartItemDto.ProductId);
             if (existingItem != null)
             {
                 existingItem.Quantity += addCartItemDto.Quantity;
@@ -80,19 +73,19 @@ namespace ECommerceApi.Services
                 });
             }
 
-            await _context.SaveChangesAsync();
+            await _unitOfWork.SaveChangesAsync();
             return Result.Success();
         }
 
         public async Task<Result> UpdateItemAsync(int cartItemId, UpdateCartItemDto updateCartItemDto)
         {
-            var user = await _userService.GetUser();
-            if (user is null)
-                return Result.Failure(ResultErrorType.NotFound, "User not found");
+            var userResult = await _userService.GetValidatedUserAsync();
+            if (!userResult.IsSuccess)
+                return Result.Failure(ResultErrorType.NotFound, userResult.ErrorMessage);
+            var user = userResult.Data;
 
             // Find Cart
-            var cart = await GetOrCreateCartAsync(user.Id, false);
-
+            var cart = await _unitOfWork.Carts.GetCartWithItems(user.Id);
             if (cart is null)
                 return Result.Failure(ResultErrorType.NotFound, "Cart not found");
 
@@ -106,28 +99,24 @@ namespace ECommerceApi.Services
             else
                 cartItem.Quantity = updateCartItemDto.Quantity;
 
-            await _context.SaveChangesAsync();
+            await _unitOfWork.SaveChangesAsync();
             return Result.Success();
         }
 
-        public async Task<Result> ClearCartAsync(string userId = null)
+        public async Task<Result> ClearCartAsync(string? userId = null)
         {
-            User user;
-            if (!string.IsNullOrEmpty(userId))
-                user = await _userService.GetUserById(userId);
-            else
-                user = await _userService.GetUser();
-    
-            if (user is null)
-                return Result.Failure(ResultErrorType.NotFound, "User not found");
+            var userResult = await _userService.GetValidatedUserAsync(userId);
+            if (!userResult.IsSuccess)
+                return Result.Failure(ResultErrorType.NotFound, userResult.ErrorMessage);
+            var user = userResult.Data;
 
             // Find Cart
-            var cart = await GetOrCreateCartAsync(user.Id, false);
+            var cart = await _unitOfWork.Carts.GetCartWithItems(user.Id);
             if (cart is null)
                 return Result.Failure(ResultErrorType.NotFound, "Cart not found");
 
             cart.Items.Clear();
-            await _context.SaveChangesAsync();
+            await _unitOfWork.SaveChangesAsync();
             return Result.Success();
         }
 
@@ -138,9 +127,6 @@ namespace ECommerceApi.Services
                 return Result<decimal>.Failure(ResultErrorType.NotFound, "Cart not found");
 
             var cart = cartResult.Data;
-            if (cart.Items.Count == 0)
-                return Result<decimal>.Failure(ResultErrorType.BadRequest, "Cart is empty");
-
             return Result<decimal>.Success(cart.TotalPrice);
         }
     }

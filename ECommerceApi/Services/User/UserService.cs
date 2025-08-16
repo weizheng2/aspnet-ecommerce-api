@@ -37,9 +37,15 @@ namespace ECommerceApi.Services
             return await _userManager.FindByEmailAsync(email);
         }
 
+        public async Task<Result<User>> GetValidatedUserAsync(string? userId = null)
+        {
+            var user = string.IsNullOrEmpty(userId) ? await GetUser() : await GetUserById(userId);
+            return user is null ? Result<User>.Failure(ResultErrorType.NotFound, "User not found") : Result<User>.Success(user);
+        }
+
         private async Task<AuthenticationResponseDto> CreateToken(string email)
         {
-             // Add claims
+            // Add claims
             var claims = new List<Claim>
             {
                 new Claim(Constants.ClaimTypeEmail, email),
@@ -55,7 +61,7 @@ namespace ECommerceApi.Services
 
             var expirationMinutes = _configuration.GetValue<int>("Jwt:ExpirationMinutes");
             var expiration = DateTime.UtcNow.AddMinutes(expirationMinutes);
-            
+
             var securityToken = new JwtSecurityToken(
                 issuer: _configuration["Jwt:Issuer"],
                 audience: _configuration["Jwt:Audience"],
