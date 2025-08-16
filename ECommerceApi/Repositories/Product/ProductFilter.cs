@@ -1,13 +1,11 @@
 using ECommerceApi.Models;
 
-namespace ECommerceApi.DTOs
+namespace ECommerceApi.Repositories
 {
-    public record FilterProductDto : PaginationDto
+    public class ProductFilter
     {
         public string? Name { get; init; }
-        
         public ProductOrderBy OrderBy { get; init; } = ProductOrderBy.Price;
         public bool AscendingOrder { get; init; } = true;
     }
 }
-

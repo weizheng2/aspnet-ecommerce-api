@@ -1,6 +1,7 @@
 using ECommerceApi.Data;
 using ECommerceApi.Extensions;
 using ECommerceApi.Models;
+using ECommerceApi.Repositories;
 using ECommerceApi.Services;
 using ECommerceApi.Swagger;
 using Microsoft.AspNetCore.Identity;
@@ -38,6 +39,13 @@ builder.Services.AddScoped<IProductService, ECommerceApi.Services.ProductService
 builder.Services.AddScoped<ICartService, CartService>();
 builder.Services.AddScoped<IPaymentService, StripePaymentService>();
 builder.Services.AddScoped<IOrderService, OrderService>();
+
+// Repositories
+builder.Services.AddScoped<IUnitOfWork, UnitOfWork>();
+builder.Services.AddScoped<IUserRepository, UserRepository>();
+builder.Services.AddScoped<IProductRepository, ProductRepository>();
+builder.Services.AddScoped<ICartRepository, CartRepository>();
+builder.Services.AddScoped<IOrderRepository, OrderRepository>();
 
 var app = builder.Build();
 
