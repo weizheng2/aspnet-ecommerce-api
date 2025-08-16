@@ -1,6 +1,6 @@
-using ECommerceApi.Data;
 using ECommerceApi.DTOs;
 using ECommerceApi.Extensions;
+using ECommerceApi.Repositories;
 using ECommerceApi.Utils;
 using Microsoft.EntityFrameworkCore;
 
@@ -8,29 +8,29 @@ namespace ECommerceApi.Services
 {
     public class OrderService : IOrderService
     {
-        private readonly ApplicationDbContext _context;
+        private readonly IUnitOfWork _unitOfWork;
         private readonly IUserService _userService;
-        public OrderService(ApplicationDbContext context, IUserService userService)
+        public OrderService(IUnitOfWork unitOfWork, IUserService userService)
         {
-            _context = context;
+            _unitOfWork = unitOfWork;
             _userService = userService;
         }
 
         public async Task<Result<PagedResult<GetOrderDto>>> GetOrdersByUserAsync(PaginationDto paginationDto)
         {
-            var user = await _userService.GetUser();
-            if (user is null)
-                return Result<PagedResult<GetOrderDto>>.Failure(ResultErrorType.NotFound, "User not found");
+            var userResult = await _userService.GetValidatedUserAsync();
+            if (!userResult.IsSuccess)
+                return Result<PagedResult<GetOrderDto>>.Failure(ResultErrorType.NotFound, userResult.ErrorMessage);
+            var user = userResult.Data;
 
-            var query = _context.Orders
-                .Include(o => o.Items)
-                    .ThenInclude(oi => oi.Product)
-                .Where(o => o.UserId == user.Id)
-                .AsQueryable();
+            var query = _unitOfWork.Orders.QueryUserOrdersWithDetails(user.Id);
 
             var totalRecords = await query.CountAsync();
-            var orders = await query.Page(paginationDto).ToListAsync();
-            var orderDtos = orders.Select(o => o.ToGetOrderDto()).ToList();
+            // var orders = await query.Page(paginationDto).ToListAsync();
+            // var orderDtos = orders.Select(o => o.ToGetOrderDto()).ToList();
+            var orderDtos = await query.Page(paginationDto)
+                            .Select(o => o.ToGetOrderDto())
+                            .ToListAsync();
 
             var result = PagedResultHelper.Create(orderDtos, totalRecords, paginationDto);
             return Result<PagedResult<GetOrderDto>>.Success(result);
@@ -38,16 +38,12 @@ namespace ECommerceApi.Services
 
         public async Task<Result<GetOrderDto>> GetOrderByUserAsync(int orderId)
         {
-            var user = await _userService.GetUser();
-            if (user is null)
-                return Result<GetOrderDto>.Failure(ResultErrorType.NotFound, "User not found");
+            var userResult = await _userService.GetValidatedUserAsync();
+            if (!userResult.IsSuccess)
+                return Result<GetOrderDto>.Failure(ResultErrorType.NotFound, userResult.ErrorMessage);
+            var user = userResult.Data;
 
-            var order = await _context.Orders
-                .Include(o => o.Items)
-                    .ThenInclude(oi => oi.Product)
-                .Where(o => o.Id == orderId && o.UserId == user.Id)
-                .FirstOrDefaultAsync();
-
+            var order = await _unitOfWork.Orders.GetUserOrderWithDetailsAsync(user.Id, orderId);
             if (order is null)
                 return Result<GetOrderDto>.Failure(ResultErrorType.NotFound, "Order not found");
       
