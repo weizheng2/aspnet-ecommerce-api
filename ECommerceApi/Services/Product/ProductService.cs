@@ -1,26 +1,23 @@
-using System.Linq.Expressions;
-using ECommerceApi.Data;
 using ECommerceApi.DTOs;
 using ECommerceApi.Extensions;
-using ECommerceApi.Models;
+using ECommerceApi.Repositories;
 using ECommerceApi.Utils;
-using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
 
 namespace ECommerceApi.Services
 {
     public class ProductService : IProductService
     {
-        private readonly ApplicationDbContext _context;
+        private readonly IUnitOfWork _unitOfWork;
 
-        public ProductService(ApplicationDbContext context)
+        public ProductService(IUnitOfWork unitOfWork)
         {
-            _context = context;
+            _unitOfWork = unitOfWork;
         }
 
         public async Task<Result<PagedResult<GetProductDto>>> GetAllProductsAsync(PaginationDto paginationDto)
         {
-            var query = _context.Products.AsQueryable();
+            var query = _unitOfWork.Products.GetQueryable();
 
             var totalRecords = await query.CountAsync();
             var products = await query.Page(paginationDto).ToListAsync();
@@ -32,22 +29,14 @@ namespace ECommerceApi.Services
 
         public async Task<Result<PagedResult<GetProductDto>>> GetProductsFilterAsync(FilterProductDto filterProductDto)
         {
-            var query = _context.Products.AsQueryable();
-
-            // Apply filters
-            if (!string.IsNullOrEmpty(filterProductDto.Name))
-                query = query.Where(p => p.Name.Contains(filterProductDto.Name));
-
-            var orderBySelectors = new Dictionary<ProductOrderBy, Expression<Func<Product, object>>>
+            var filter = new ProductFilter
             {
-                [ProductOrderBy.Name] = p => p.Name!,
-                [ProductOrderBy.Price] = p => p.Price!
+                Name = filterProductDto.Name,
+                OrderBy = filterProductDto.OrderBy,
+                AscendingOrder = filterProductDto.AscendingOrder
             };
 
-            if (orderBySelectors.TryGetValue(filterProductDto.OrderBy, out var selector))
-                query = filterProductDto.AscendingOrder ? query.OrderBy(selector) : query.OrderByDescending(selector);
-            else
-                query = query.OrderBy(p => p.Name);
+            var query = _unitOfWork.Products.GetFilteredQuery(filter);
 
             // Apply pagination
             var totalRecords = await query.CountAsync();
@@ -60,7 +49,7 @@ namespace ECommerceApi.Services
 
         public async Task<Result<GetProductDto>> GetProductAsync(int id)
         {
-            var product = await _context.Products.FirstOrDefaultAsync(p => p.Id == id);
+            var product = await _unitOfWork.Products.FirstOrDefaultAsync(p => p.Id == id);
             if (product == null)
                 return Result<GetProductDto>.Failure(ResultErrorType.NotFound);
      
@@ -69,20 +58,20 @@ namespace ECommerceApi.Services
 
         public async Task<Result<GetProductDto>> CreateProductAsync(CreateProductDto productDto)
         {
-            var product = await _context.Products.FirstOrDefaultAsync(p => p.Sku == productDto.Sku);
+            var product = await _unitOfWork.Products.FirstOrDefaultAsync(p => p.Sku == productDto.Sku);
             if (product != null)
                 return Result<GetProductDto>.Failure(ResultErrorType.BadRequest, "Product with the same SKU already exists.");
-    
+
             product = productDto.ToProduct();
-            _context.Products.Add(product);
-            await _context.SaveChangesAsync();
-            
+            _unitOfWork.Products.Add(product);
+            await _unitOfWork.SaveChangesAsync();
+
             return Result<GetProductDto>.Success(product.ToGetProductDto());
         }
 
         public async Task<Result> UpdateProductAsync(int id, UpdateProductDto productDto)
         {
-            var product = await _context.Products.FirstOrDefaultAsync(p => p.Id == id);
+            var product = await _unitOfWork.Products.FirstOrDefaultAsync(p => p.Id == id);
             if (product == null)
                 return Result.Failure(ResultErrorType.NotFound);
 
@@ -92,19 +81,19 @@ namespace ECommerceApi.Services
             if (productDto.Price.HasValue) product.Price = productDto.Price.Value;
             if (productDto.ImageUrl != null) product.ImageUrl = productDto.ImageUrl;
 
-            await _context.SaveChangesAsync();
-            
+            await _unitOfWork.SaveChangesAsync();
+
             return Result.Success();
         }
 
         public async Task<Result> DeleteProductAsync(int id)
         {
-            var product = await _context.Products.FirstOrDefaultAsync(p => p.Id == id);
+            var product = await _unitOfWork.Products.FirstOrDefaultAsync(p => p.Id == id);
             if (product == null)
                 return Result.Failure(ResultErrorType.NotFound);
 
-            _context.Products.Remove(product);
-            await _context.SaveChangesAsync();
+            _unitOfWork.Products.Remove(product);
+            await _unitOfWork.SaveChangesAsync();
 
             return Result.Success();
         }
