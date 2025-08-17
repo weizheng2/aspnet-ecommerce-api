@@ -89,7 +89,7 @@ Access the live API via Swagger (may take a few seconds to start if idle):
   ```bash
    git clone https://github.com/weizheng2/aspnet-ecommerce-api.git
   ```
-2. **Set up keys in appsettings.Development.json or appsettings.json**
+2. Configure keys in appsettings.json, environment variables, user-secrets, etc:  
   ```bash
    ConnectionStrings__DefaultConnection (Database)
    Stripe__SecretKey 
