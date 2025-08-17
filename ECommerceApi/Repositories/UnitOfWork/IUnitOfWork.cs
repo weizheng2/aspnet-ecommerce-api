@@ -1,3 +1,5 @@
+using Microsoft.EntityFrameworkCore.Storage;
+
 namespace ECommerceApi.Repositories
 {
     public interface IUnitOfWork : IDisposable
@@ -7,5 +9,8 @@ namespace ECommerceApi.Repositories
         IOrderRepository Orders { get; }
 
         Task<int> SaveChangesAsync();
+        Task<IDbContextTransaction> BeginTransactionAsync();
+        Task CommitTransactionAsync();
+        Task RollbackTransactionAsync();
     }
 }

@@ -1,5 +1,6 @@
 using ECommerceApi.Data;
 using ECommerceApi.Models;
+using ECommerceApi.Repositories;
 using ECommerceApi.Utils;
 using Stripe;
 using Stripe.Checkout;
@@ -10,12 +11,12 @@ namespace ECommerceApi.Services
     {
         private readonly ICartService _cartService;
         private readonly IUserService _userService;
-        private readonly ApplicationDbContext _context;
+        private readonly IUnitOfWork _unitOfWork;
         private readonly IConfiguration _configuration;
 
-        public StripePaymentService(ApplicationDbContext context, ICartService cartService, IUserService userService, IConfiguration configuration)
+        public StripePaymentService(IUnitOfWork unitOfWork, ICartService cartService, IUserService userService, IConfiguration configuration)
         {
-            _context = context;
+            _unitOfWork = unitOfWork;
             _cartService = cartService;
             _userService = userService;
             _configuration = configuration;
@@ -141,11 +142,9 @@ namespace ECommerceApi.Services
                 options.AddExpand("line_items.data.price.product");
 
                 var sessionService = new SessionService();
-                var sessionWithLineItems = sessionService.Get(session.Id, options);
+                var sessionWithLineItems = await sessionService.GetAsync(session.Id, options);
                 
                 await SaveOrderAndClearCart(userId!, session, sessionWithLineItems);
-
-                //Console.WriteLine($"Order created successfully for session {session.Id}");
             }
             catch (Exception ex)
             {
@@ -169,8 +168,6 @@ namespace ECommerceApi.Services
                 UpdatedAt = DateTime.UtcNow
             };
 
-            //Console.WriteLine($"Order created: {JsonSerializer.Serialize(order, new JsonSerializerOptions { WriteIndented = true })}");
-
             // Order Items
             var orderItems = new List<OrderItem>();
             foreach (var item in sessionWithLineItems.LineItems.Data)
@@ -188,20 +185,22 @@ namespace ECommerceApi.Services
                 orderItems.Add(orderItem);
             }
 
-            //Console.WriteLine($"Order items: {JsonSerializer.Serialize(orderItems, new JsonSerializerOptions { WriteIndented = true })}");
-
             order.Items = orderItems;
 
-            // Ensure correct transaction
-            using var transaction = await _context.Database.BeginTransactionAsync();
+            await _unitOfWork.BeginTransactionAsync();
+            try
+            {
+                _unitOfWork.Orders.Add(order);
+                await _cartService.ClearCartAsync(userId, saveChanges: false);
+                await _unitOfWork.SaveChangesAsync();
 
-            // Save Order
-            _context.Orders.Add(order);
-            await _context.SaveChangesAsync(); 
-
-            // Clear cart
-            await _cartService.ClearCartAsync(userId); 
-            await transaction.CommitAsync();
+                await _unitOfWork.CommitTransactionAsync();
+            }
+            catch
+            {
+                await _unitOfWork.RollbackTransactionAsync();
+                throw;
+            }
         }
     }
 

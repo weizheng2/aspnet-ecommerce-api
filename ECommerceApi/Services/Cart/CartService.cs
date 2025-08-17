@@ -103,7 +103,7 @@ namespace ECommerceApi.Services
             return Result.Success();
         }
 
-        public async Task<Result> ClearCartAsync(string? userId = null)
+        public async Task<Result> ClearCartAsync(string? userId = null, bool saveChanges = true)
         {
             var userResult = await _userService.GetValidatedUserAsync(userId);
             if (!userResult.IsSuccess)
@@ -116,7 +116,10 @@ namespace ECommerceApi.Services
                 return Result.Failure(ResultErrorType.NotFound, "Cart not found");
 
             cart.Items.Clear();
-            await _unitOfWork.SaveChangesAsync();
+
+            if(saveChanges)
+                await _unitOfWork.SaveChangesAsync();
+                
             return Result.Success();
         }
 
