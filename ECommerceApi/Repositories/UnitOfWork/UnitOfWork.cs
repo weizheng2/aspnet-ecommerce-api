@@ -9,15 +9,13 @@ namespace ECommerceApi.Repositories
         public IProductRepository Products { get; }
         public ICartRepository Carts { get; }
         public IOrderRepository Orders { get; }
-        public IUserRepository Users { get; }
 
-        public UnitOfWork(ApplicationDbContext context, IProductRepository products, ICartRepository carts, IOrderRepository orders, IUserRepository users)
+        public UnitOfWork(ApplicationDbContext context, IProductRepository products, ICartRepository carts, IOrderRepository orders)
         {
             _context = context;
             Products = products;
             Carts = carts;
             Orders = orders;
-            Users = users;
         }
 
         public async Task<int> SaveChangesAsync() => await _context.SaveChangesAsync();

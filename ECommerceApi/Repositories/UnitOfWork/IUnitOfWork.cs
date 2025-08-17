@@ -5,7 +5,6 @@ namespace ECommerceApi.Repositories
         IProductRepository Products { get; }
         ICartRepository Carts { get; }
         IOrderRepository Orders { get; }
-        IUserRepository Users { get; }
 
         Task<int> SaveChangesAsync();
     }
