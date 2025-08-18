@@ -20,8 +20,9 @@ namespace ECommerceApi.Services
             var query = _unitOfWork.Products.GetQueryable();
 
             var totalRecords = await query.CountAsync();
-            var products = await query.Page(paginationDto).ToListAsync();
-            var productsDto = products.Select(p => p.ToGetProductDto()).ToList();
+            var productsDto = await query.Page(paginationDto)
+                            .Select(p => p.ToGetProductDto())
+                            .ToListAsync();
 
             var result = PagedResultHelper.Create(productsDto, totalRecords, paginationDto);
             return Result<PagedResult<GetProductDto>>.Success(result);

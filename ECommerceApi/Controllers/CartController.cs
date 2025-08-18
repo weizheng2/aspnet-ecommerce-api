@@ -30,7 +30,7 @@ namespace ECommerceApi.Controllers
             if (result.IsSuccess)
                 return Ok(result.Data);
 
-            return NotFound();
+            return NotFound(result.ErrorMessage);
         }
 
         [HttpPost]

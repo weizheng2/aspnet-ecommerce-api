@@ -39,7 +39,10 @@ namespace ECommerceApi.Controllers
         public async Task<ActionResult<GetProductDto>> GetProduct(int id)
         {
             var result = await _productService.GetProductAsync(id);
-            return result.IsSuccess ? Ok(result.Data) : NotFound();
+            if (result.IsSuccess)
+                return Ok(result.Data);
+
+            return NotFound(result.ErrorMessage);
         }
 
         [HttpPost]
@@ -49,13 +52,13 @@ namespace ECommerceApi.Controllers
             var result = await _productService.CreateProductAsync(createProductDto);
             if (result.IsSuccess)
             {
-                var products = result.Data;
-                return CreatedAtAction(nameof(GetProduct), new { id = products.Id }, products);
+                var product = result.Data;
+                return CreatedAtAction(nameof(GetProduct), new { id = product.Id }, product);
             }
 
             switch (result.ErrorType)
             {
-                case ResultErrorType.NotFound: return NotFound();
+                case ResultErrorType.NotFound: return NotFound(result.ErrorMessage);
                 default: return BadRequest(result.ErrorMessage);
             }
         }
@@ -70,7 +73,7 @@ namespace ECommerceApi.Controllers
 
             switch (result.ErrorType)
             {
-                case ResultErrorType.NotFound: return NotFound();
+                case ResultErrorType.NotFound: return NotFound(result.ErrorMessage);
                 default: return BadRequest(result.ErrorMessage);
             }
         }
@@ -85,7 +88,7 @@ namespace ECommerceApi.Controllers
 
             switch (result.ErrorType)
             {
-                case ResultErrorType.NotFound: return NotFound();
+                case ResultErrorType.NotFound: return NotFound(result.ErrorMessage);
                 default: return BadRequest(result.ErrorMessage);
             }
         }

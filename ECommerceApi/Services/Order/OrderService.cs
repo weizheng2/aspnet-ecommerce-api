@@ -26,8 +26,6 @@ namespace ECommerceApi.Services
             var query = _unitOfWork.Orders.QueryUserOrdersWithDetails(user.Id);
 
             var totalRecords = await query.CountAsync();
-            // var orders = await query.Page(paginationDto).ToListAsync();
-            // var orderDtos = orders.Select(o => o.ToGetOrderDto()).ToList();
             var orderDtos = await query.Page(paginationDto)
                             .Select(o => o.ToGetOrderDto())
                             .ToListAsync();
