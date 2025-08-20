@@ -1,5 +1,5 @@
 # ASP.NET Ecommerce API
-A RESTful ASP.NET Core Web API for an e-commerce platform, designed to handle products, carts, orders, payments, and user management with authentication and role-based authorization.
+A RESTful ASP.NET Core Web API demonstration for an **e-commerce platform**, designed to handle products, carts, orders, payments, and user management with authentication and role-based authorization.
 
 ## 🚀 Key Features
 
@@ -10,16 +10,16 @@ A RESTful ASP.NET Core Web API for an e-commerce platform, designed to handle pr
 - **User Management:** JWT authentication and role-based authorization for Admin and User access.  
 - **Additional Features:** Pagination, API versioning for maintainability and rate limiting to manage traffic.
 
-
 ## 🛠️ Technologies Used
 - ASP.NET Core
 - Entity Framework Core with SQL database
+- Unit and Integration Tests with xUnit
+- Controller → Service → Repository pattern
 - JWT Authentication
-- Stripe Payment Gateway
+- Cache with Redis
 - API Versioning
 - Rate Limiting
 - Swagger/OpenAPI
-
 
 ## 📚 Project Source
 This project is based on the roadmap.sh E-commerce API project:
@@ -30,11 +30,12 @@ This project is based on the roadmap.sh E-commerce API project:
 Access the live API via Swagger (may take a few seconds to start if idle):
 [https://wz-ecommerce-api.runasp.net/swagger/index.html](https://wz-ecommerce-api.runasp.net/swagger/index.html)
 
----
 
-## API Endpoints
+## 📡 API Endpoints
 
-### Cart Management
+<details>
+<summary>🛒 Cart Endpoints</summary>
+  
 | Method | Endpoint | Description | Auth |
 |--------|----------|-------------|------|
 | `GET` | `/cart` | Get all cart items from user's cart | ✅ |
@@ -42,13 +43,21 @@ Access the live API via Swagger (may take a few seconds to start if idle):
 | `PUT` | `/cart/{cartItemId}` | Update cart item quantity or remove if 0 or negative | ✅ |
 | `DELETE` | `/cart/clear` | Remove all items from cart | ✅ |
 
-### Order Management  
+</details>
+  
+<details>
+<summary>📦 Orders Endpoints</summary>
+  
 | Method | Endpoint | Description | Auth |
 |--------|----------|-------------|------|
 | `GET` | `/order` | Get all user orders | ✅ |
 | `GET` | `/order/{orderId}` | Get order by ID | ✅ |
 
-### Payment Processing
+</details>
+
+<details>
+<summary>💳 Payment Endpoints</summary>
+  
 | Method | Endpoint | Description | Auth |
 |--------|----------|-------------|------|
 | `POST` | `/payment/create-checkout-session` | Create Stripe checkout session | ✅ |
@@ -56,7 +65,11 @@ Access the live API via Swagger (may take a few seconds to start if idle):
 | `GET` | `/payment/payment-cancelled` | Cancelled page after checkout | ❌ |
 | `POST` | `/payment/webhook` | Handle Stripe webhooks | ❌ |
 
-### Product Management
+</details>
+
+<details>
+<summary>🛍️ Products Endpoints</summary>
+  
 | Method | Endpoint | Description | Auth | Admin |
 |--------|----------|-------------|------|-------|
 | `GET` | `/products` | Get all products | ❌ | ❌ |
@@ -66,7 +79,11 @@ Access the live API via Swagger (may take a few seconds to start if idle):
 | `PUT` | `/products/{id}` | Update product | ✅ | ✅ |
 | `DELETE` | `/products/{id}` | Delete product | ✅ | ✅ |
 
-### User Authentication
+</details>
+
+<details>
+<summary>👥 Users Endpoints</summary>
+  
 | Method | Endpoint | Description | Auth | Admin |
 |--------|----------|-------------|------|-------|
 | `POST` | `/register` | Register new user | ❌ | ❌ |
@@ -74,24 +91,40 @@ Access the live API via Swagger (may take a few seconds to start if idle):
 | `POST` | `/refresh-token` | Refresh JWT token | ✅ | ❌ |
 | `POST` | `/make-admin` | Grant admin privileges | ✅ | ✅ |
 
----
+</details>
 
-## Getting Started
+
+## ⚙️ Getting Started
 
 ### Prerequisites
 - .NET 9.0 SDK
 - SQL Server
-- Stripe Account (for payment processing)
+- Redis (Optional)
+- Stripe Account (Optional for payment processing)
 
 ### Installation
 
-1. **Clone the repository**
-  ```bash
-   git clone https://github.com/weizheng2/aspnet-ecommerce-api.git
-  ```
-2. Configure keys in appsettings.json, environment variables, user-secrets, etc:  
-  ```bash
-   ConnectionStrings__DefaultConnection (Database)
-   Stripe__SecretKey 
-   Stripe__EndPointSecret
-   AppSettings__BaseUrl (For Stripe success and cancel url)
+1. **Clone the repository**  
+   `git clone https://github.com/weizheng2/aspnet-ecommerce-api.git`
+
+2. **Configure application settings**  
+   Update your appsettings.json, environment variables, or user-secrets with the required keys:  
+   ```json
+   {
+     "ConnectionStrings": {
+       "DefaultConnection": "Your SQL Server connection string",
+       "Redis": "Optional Redis connection string"
+     },
+     "Stripe": {
+       "SecretKey": "",
+       "EndPointSecret": ""
+     },
+     "AppSettings": {
+       "BaseUrl": "(Optional) For Stripe success and cancel url"
+     }
+   }
+   ```
+   
+3. **Run and test the application locally**  
+   `dotnet run`  
+   `http://localhost:5177/swagger/index.html`
