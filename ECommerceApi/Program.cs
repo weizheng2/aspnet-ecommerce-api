@@ -48,12 +48,16 @@ builder.Services.AddScoped<IUnitOfWork, UnitOfWork>();
 
 var app = builder.Build();
 
-using (var scope = app.Services.CreateScope())
+// Only run migrations in non-test environments
+if (!builder.Environment.IsEnvironment("Testing"))
 {
-    var dbContext = scope.ServiceProvider.GetRequiredService<ApplicationDbContext>();
-    if (dbContext.Database.IsRelational())
+    using (var scope = app.Services.CreateScope())
     {
-        dbContext.Database.Migrate();
+        var dbContext = scope.ServiceProvider.GetRequiredService<ApplicationDbContext>();
+        if (dbContext.Database.IsRelational())
+        {
+            dbContext.Database.Migrate();
+        }
     }
 }
 
