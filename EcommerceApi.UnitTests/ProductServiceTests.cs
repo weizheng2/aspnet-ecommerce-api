@@ -42,16 +42,13 @@ namespace ECommerceApi.UnitTests
                     Id = 1,
                     Sku = "SKU001",
                     Name = "Test Product 1",
-                    Description = "Description for product 1",
                     Price = 10.99m,
-                    ImageUrl = "https://example.com/image1.jpg"
                 },
                 new Product 
                 { 
                     Id = 2,
                     Sku = "SKU002",
                     Name = "Test Product 2",
-                    Description = "Description for product 2",
                     Price = 25.50m
                 },
                 new Product 
@@ -59,7 +56,6 @@ namespace ECommerceApi.UnitTests
                     Id = 3,
                     Sku = "SKU003",
                     Name = "Another Product",
-                    Description = "Description for product 3",
                     Price = 5.99m
                 }
             };
@@ -224,7 +220,6 @@ namespace ECommerceApi.UnitTests
             var updatedProduct = await _context.Products.FindAsync(productId);
             Assert.Equal("Updated Product Name", updatedProduct.Name);
             Assert.Equal(12.99m, updatedProduct.Price);
-            Assert.Equal("Description for product 1", updatedProduct.Description);
         }
 
         [Fact]
