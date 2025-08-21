@@ -4,7 +4,7 @@
     <TargetFramework>net9.0</TargetFramework>
     <Nullable>enable</Nullable>
     <ImplicitUsings>enable</ImplicitUsings>
-    <RootNamespace>aspnet_ecommerce_api</RootNamespace>
+    <RootNamespace>ecommerce_api</RootNamespace>
     <UserSecretsId>3dbfbf71-c574-4d88-8bbd-b9d10b4f8100</UserSecretsId>
   </PropertyGroup>
 
