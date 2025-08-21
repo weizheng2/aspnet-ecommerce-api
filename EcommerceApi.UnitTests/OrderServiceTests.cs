@@ -37,8 +37,8 @@ namespace ECommerceApi.UnitTests
             _orderService = new OrderService(_unitOfWork, _mockUserService.Object);
 
             // Set up test users
-            _testUser = new User { Id = "user123", UserName = "testuser", Email = "test@example.com" };
-            _otherUser = new User { Id = "other456", UserName = "otheruser", Email = "other@example.com" };
+            _testUser = new User { Id = "user123", UserName = "test@example.com", Email = "test@example.com" };
+            _otherUser = new User { Id = "other456", UserName = "other@example.com", Email = "other@example.com" };
 
             // Default mock setup - can be overridden in individual tests
             // Whenever someone calls GetValidatedUserAsync with ANY string parameter (or null), return a successful result containing _testUser

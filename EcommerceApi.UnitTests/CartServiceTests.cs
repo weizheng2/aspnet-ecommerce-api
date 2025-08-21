@@ -39,8 +39,8 @@ namespace ECommerceApi.UnitTests
             _cartService = new CartService(_unitOfWork, _mockUserService.Object);
 
             // Set up test data
-            _testUser = new User { Id = "user123", UserName = "testuser", Email = "test@example.com" };
-            _otherUser = new User { Id = "other456", UserName = "otheruser", Email = "other@example.com" };
+            _testUser = new User { Id = "user123", UserName = "test@example.com", Email = "test@example.com" };
+            _otherUser = new User { Id = "other456", UserName = "other@example.com", Email = "other@example.com" };
 
             // Default mock setup - can be overridden in individual tests
             _mockUserService.Setup(x => x.GetValidatedUserAsync(It.IsAny<string>())).ReturnsAsync(Result<User>.Success(_testUser));
