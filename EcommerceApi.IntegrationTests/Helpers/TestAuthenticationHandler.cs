@@ -1,11 +1,10 @@
 using System.Security.Claims;
 using System.Text.Encodings.Web;
-using ECommerceApi;
 using Microsoft.AspNetCore.Authentication;
 using Microsoft.Extensions.Logging;
 using Microsoft.Extensions.Options;
 
-namespace EcommerceApi.IntegrationTests
+namespace ECommerceApi.IntegrationTests
 {
     public interface ITestUserProvider
     {

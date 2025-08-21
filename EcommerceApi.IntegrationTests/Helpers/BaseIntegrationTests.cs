@@ -5,8 +5,9 @@ using Microsoft.AspNetCore.Mvc.Testing;
 using Microsoft.AspNetCore.Hosting;
 using Microsoft.EntityFrameworkCore.Infrastructure;
 using Microsoft.EntityFrameworkCore;
+using System.Security.Claims;
 
-namespace EcommerceApi.IntegrationTests
+namespace ECommerceApi.IntegrationTests
 {
     public class CustomWebApplicationFactory : WebApplicationFactory<Program>
     {
@@ -90,6 +91,24 @@ namespace EcommerceApi.IntegrationTests
         {
             var scope = Factory.Services.CreateScope();
             return scope.ServiceProvider.GetRequiredService<ApplicationDbContext>();
+        }
+
+        protected void SetCustomUserAuth(string email, bool authorized = true, bool isAdmin = false)
+        {
+            using var scope = Factory.Services.CreateScope();
+            var provider = scope.ServiceProvider.GetRequiredService<ITestUserProvider>();
+            
+            var claims = new List<Claim>
+            {
+                new(Constants.ClaimTypeEmail, email)
+            };
+
+            if (isAdmin)
+            {
+                claims.Add(new Claim(Constants.PolicyIsAdmin, "true"));
+            }
+
+            provider.CurrentUser = new ClaimsPrincipal(new ClaimsIdentity(claims, authorized ? "Test" : ""));
         }
     }
 }
