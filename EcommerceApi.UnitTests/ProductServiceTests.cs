@@ -6,7 +6,7 @@ using ECommerceApi.Repositories;
 using ECommerceApi.Services;
 using Microsoft.EntityFrameworkCore;
 
-namespace ECommerceApi.Tests.Services
+namespace ECommerceApi.UnitTests
 {
     public class ProductServiceTests : IDisposable
     {
