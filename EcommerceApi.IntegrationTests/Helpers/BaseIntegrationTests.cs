@@ -72,8 +72,6 @@ namespace ECommerceApi.IntegrationTests
             context.Database.EnsureCreated();
 
             await SeedSpecificTestData(context);
-
-            await context.SaveChangesAsync();
         }
 
         protected virtual Task SeedSpecificTestData(ApplicationDbContext context)
