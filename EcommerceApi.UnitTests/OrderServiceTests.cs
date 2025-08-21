@@ -270,7 +270,7 @@ namespace ECommerceApi.UnitTests
         }
 
         [Fact]
-        public async Task GetOrderByUserAsync_OrderWithMultipleItems_CalculatesCorrectTotals()
+        public async Task GetOrderByUserAsync_OrderWithMultipleItems_ReturnsCorrectPrices()
         {
             // Arrange - Order with 2 items
             var orderId = 1;
