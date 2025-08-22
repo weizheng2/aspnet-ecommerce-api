@@ -27,7 +27,7 @@ This project is based on the roadmap.sh E-commerce API project:
 
 
 ## 🌐 Live Demo
-Access the live API via Swagger (the server may take a few seconds to start if idle): 
+Access the live API via Swagger (the server may take a few seconds to start if idle):  
 [https://wz-ecommerce-api.runasp.net/swagger/index.html](https://wz-ecommerce-api.runasp.net/swagger/index.html)
 
 
