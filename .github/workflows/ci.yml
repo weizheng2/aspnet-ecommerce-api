@@ -1,0 +1,42 @@
+name: CI
+
+# When to run this workflow
+on:
+  # Manual execution
+  workflow_dispatch:
+  
+  push:
+    branches: [ main ]
+  pull_request:
+    branches: [ main ]
+
+jobs:
+  build-and-test:
+    runs-on: ubuntu-latest
+
+    steps:
+    # Download code
+    - name: Checkout code
+      uses: actions/checkout@v5.0.0
+
+    # Install .NET
+    - name: Setup .NET
+      uses: actions/setup-dotnet@v4
+      with:
+        dotnet-version: '9.0.x'
+
+    # Restore NuGet packages
+    - name: Restore dependencies
+      run: dotnet restore
+
+    # Build the project
+    - name: Build
+      run: dotnet build --no-restore
+
+    # Run unit tests
+    - name: Run Unit Tests
+      run: dotnet test ECommerceApi.UnitTests --no-build --verbosity normal
+
+    # Run integration tests
+    - name: Run Integration Tests
+      run: dotnet test ECommerceApi.IntegrationTests --no-build --verbosity normal
