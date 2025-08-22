@@ -1,20 +1,20 @@
 # ASP.NET Ecommerce API
-A RESTful ASP.NET Core Web API demonstration for an **e-commerce platform**, designed to handle products, carts, orders, payments, and user management with authentication and role-based authorization.
+A RESTful ASP.NET Core Web API demo for an **e-commerce platform**. It handles products, carts, orders, payments, and user management with authentication and role-based authorization.
 
 ## 🚀 Key Features
 
 - **Products:** Full CRUD operations, with admin-only endpoints for creating, updating, and deleting products.  
 - **Cart:** Add, remove, clear items, and calculate total cost for checkout.  
-- **Orders:** Manage user orders and retrieve order history and details.  
+- **Orders:** Manage user orders and get order history and details.  
 - **Payment Integration:** Stripe checkout session and webhook handling for verification and order creation.  
 - **User Management:** JWT authentication and role-based authorization for Admin and User access.  
 - **Additional Features:** Pagination, API versioning for maintainability and rate limiting to manage traffic.
 
 ## 🛠️ Technologies Used
 - ASP.NET Core
-- Entity Framework Core with SQL database
+- Entity Framework Core with SQL Server
 - Unit and Integration Tests with xUnit
-- CI with Github Actions
+- CI/CD with GitHub Actions
 - Controller → Service → Repository pattern
 - JWT Authentication
 - API Versioning
@@ -27,7 +27,7 @@ This project is based on the roadmap.sh E-commerce API project:
 
 
 ## 🌐 Live Demo
-Access the live API via Swagger (may take a few seconds to start if idle):  
+Access the live API via Swagger (the server may take a few seconds to start if idle): 
 [https://wz-ecommerce-api.runasp.net/swagger/index.html](https://wz-ecommerce-api.runasp.net/swagger/index.html)
 
 
@@ -99,7 +99,7 @@ Access the live API via Swagger (may take a few seconds to start if idle):
 ### Prerequisites
 - .NET 9.0 SDK
 - SQL Server
-- Stripe Account (Optional for payment processing)
+- Stripe account (optional, for payment processing)
 
 ### Installation
 
@@ -118,7 +118,7 @@ Access the live API via Swagger (may take a few seconds to start if idle):
        "EndPointSecret": ""
      },
      "AppSettings": {
-       "BaseUrl": "(Optional) For Stripe success and cancel url"
+       "BaseUrl": "(Optional) Used for Stripe success and cancel URLs""
      }
    }
    ```
