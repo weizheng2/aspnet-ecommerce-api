@@ -7,8 +7,17 @@ on:
   
   push:
     branches: [ main ]
+    paths:
+      - 'ECommerceApi/**'
+      - 'ECommerceApi.UnitTests/**'
+      - 'ECommerceApi.IntegrationTests/**'
+    
   pull_request:
     branches: [ main ]
+    paths:
+      - 'ECommerceApi/**'
+      - 'ECommerceApi.UnitTests/**'
+      - 'ECommerceApi.IntegrationTests/**'
 
 jobs:
   build-and-test:
