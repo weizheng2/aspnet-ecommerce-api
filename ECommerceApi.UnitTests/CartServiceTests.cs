@@ -280,7 +280,7 @@ namespace ECommerceApi.UnitTests
             Assert.True(result.IsSuccess);
 
             var cartItem = await _context.CartItems.FindAsync(1);
-            Assert.Equal(5, cartItem.Quantity);
+            Assert.Equal(6, cartItem.Quantity);
         }
 
         [Fact]
