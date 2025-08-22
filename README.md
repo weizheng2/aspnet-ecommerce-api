@@ -14,9 +14,9 @@ A RESTful ASP.NET Core Web API demonstration for an **e-commerce platform**, des
 - ASP.NET Core
 - Entity Framework Core with SQL database
 - Unit and Integration Tests with xUnit
+- CI with Github Actions
 - Controller → Service → Repository pattern
 - JWT Authentication
-- Cache with Redis
 - API Versioning
 - Rate Limiting
 - Swagger/OpenAPI
