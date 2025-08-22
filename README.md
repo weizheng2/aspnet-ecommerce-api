@@ -22,12 +22,12 @@ A RESTful ASP.NET Core Web API demonstration for an **e-commerce platform**, des
 - Swagger/OpenAPI
 
 ## 📚 Project Source
-This project is based on the roadmap.sh E-commerce API project:
+This project is based on the roadmap.sh E-commerce API project:  
 [https://roadmap.sh/projects/ecommerce-api](https://roadmap.sh/projects/ecommerce-api)
 
 
 ## 🌐 Live Demo
-Access the live API via Swagger (may take a few seconds to start if idle):
+Access the live API via Swagger (may take a few seconds to start if idle):  
 [https://wz-ecommerce-api.runasp.net/swagger/index.html](https://wz-ecommerce-api.runasp.net/swagger/index.html)
 
 
