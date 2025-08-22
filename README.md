@@ -99,7 +99,6 @@ Access the live API via Swagger (may take a few seconds to start if idle):
 ### Prerequisites
 - .NET 9.0 SDK
 - SQL Server
-- Redis (Optional)
 - Stripe Account (Optional for payment processing)
 
 ### Installation
@@ -112,8 +111,7 @@ Access the live API via Swagger (may take a few seconds to start if idle):
    ```json
    {
      "ConnectionStrings": {
-       "DefaultConnection": "Your SQL Server connection string",
-       "Redis": "Optional Redis connection string"
+       "DefaultConnection": "Your SQL Server connection string"
      },
      "Stripe": {
        "SecretKey": "",
