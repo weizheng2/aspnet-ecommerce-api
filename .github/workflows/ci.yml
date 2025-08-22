@@ -5,10 +5,19 @@ on:
   # Manual execution
   workflow_dispatch:
   
-    #push:
-     # branches: [ main ]
-   # pull_request:
-    #  branches: [ main ]
+  push:
+    branches: [ main ]
+    paths:
+      - 'ECommerceApi/**'
+      - 'ECommerceApi.UnitTests/**'
+      - 'ECommerceApi.IntegrationTests/**'
+    
+  pull_request:
+    branches: [ main ]
+    paths:
+      - 'ECommerceApi/**'
+      - 'ECommerceApi.UnitTests/**'
+      - 'ECommerceApi.IntegrationTests/**'
 
 jobs:
   build-and-test:
@@ -25,6 +34,15 @@ jobs:
       with:
         dotnet-version: '9.0.x'
 
+    # Cache NuGet packages
+    - name: Cache NuGet packages
+      uses: actions/cache@v4
+      with:
+        path: ~/.nuget/packages
+        key: ${{ runner.os }}-nuget-${{ hashFiles('**/*.csproj') }}
+        restore-keys: |
+          ${{ runner.os }}-nuget-
+          
     # Restore NuGet packages
     - name: Restore dependencies
       run: dotnet restore
