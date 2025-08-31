@@ -2,7 +2,7 @@ using Microsoft.AspNetCore.Authorization;
 using Microsoft.OpenApi.Models;
 using Swashbuckle.AspNetCore.SwaggerGen;
 
-namespace ECommerce.Api.Swagger;
+namespace ECommerce.Api.Extensions.Swagger;
 
 public class AuthorizationFilter : IOperationFilter
 {

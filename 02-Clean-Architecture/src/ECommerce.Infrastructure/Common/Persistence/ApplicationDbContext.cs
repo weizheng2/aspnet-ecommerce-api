@@ -1,19 +1,17 @@
 using System.Reflection;
+using ECommerce.Application.Repositories;
 using ECommerce.Domain.Entities;
 using Microsoft.EntityFrameworkCore;
 
 namespace ECommerce.Infrastructure.Persistence
 {
-    public class ApplicationDbContext : DbContext //IdentityDbContext<User>
+    public class ApplicationDbContext : DbContext, IUnitOfWork //IdentityDbContext<User>
     {
         public ApplicationDbContext(DbContextOptions<ApplicationDbContext> options) : base(options)
         {
         }
         protected override void OnModelCreating(ModelBuilder modelBuilder)
         {
-            // modelBuilder.Entity<OrderItem>().Property(o => o.UnitPrice).HasPrecision(18, 2);
-            // modelBuilder.Entity<Product>().Property(p => p.Price).HasPrecision(18, 2);
-
             modelBuilder.ApplyConfigurationsFromAssembly(Assembly.GetExecutingAssembly());
 
             base.OnModelCreating(modelBuilder);

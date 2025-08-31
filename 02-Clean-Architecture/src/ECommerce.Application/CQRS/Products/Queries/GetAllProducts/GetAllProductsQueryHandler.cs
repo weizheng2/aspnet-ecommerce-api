@@ -1,4 +1,5 @@
 using ECommerce.Application.Common;
+using ECommerce.Application.Common.Mappings;
 using ECommerce.Application.Repositories;
 using ECommerce.Domain.Common;
 using MediatR;
@@ -16,14 +17,16 @@ public class GetAllProductsQueryHandler : IRequestHandler<GetAllProductsQuery, R
 
     public async Task<Result<PagedResult<GetProductDto>>> Handle(GetAllProductsQuery request, CancellationToken cancellationToken)
     {
-        var query = _unitOfWork.Products.GetQueryable();
+        var pagedProducts = await _productRepository.GetPagedAsync(request.PaginationDto);
+        
+        var pagedProductsDto = new PagedResult<GetProductDto>(
+            data: pagedProducts.Data.Select(p => p.ToGetProductDto()).ToList(),
+            totalRecords: pagedProducts.TotalRecords,
+            page: pagedProducts.Page,
+            recordsPerPage: pagedProducts.RecordsPerPage
+        );
 
-        var totalRecords = await query.CountAsync();
-        var productsDto = await query.Page(paginationDto)
-                        .Select(p => p.ToGetProductDto())
-                        .ToListAsync();
-
-        var result = PagedResultHelper.Create(productsDto, totalRecords, paginationDto);
-        return Result<PagedResult<GetProductDto>>.Success(result);
+        return Result<PagedResult<GetProductDto>>.Success(pagedProductsDto);
     }
+
 }

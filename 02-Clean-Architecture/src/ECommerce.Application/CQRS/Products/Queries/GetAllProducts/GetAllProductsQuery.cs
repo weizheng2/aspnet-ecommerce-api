@@ -4,4 +4,4 @@ using MediatR;
 
 namespace ECommerce.Application.Products;
 
-public record GetAllProductsQuery(int Page, int PagesPerRecord) : IRequest<Result<PagedResult<GetProductDto>>>;
+public record GetAllProductsQuery(PaginationDto PaginationDto) : IRequest<Result<PagedResult<GetProductDto>>>;

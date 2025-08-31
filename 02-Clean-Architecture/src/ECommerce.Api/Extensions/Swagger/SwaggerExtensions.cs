@@ -3,7 +3,7 @@ using Microsoft.Extensions.Options;
 using Microsoft.OpenApi.Models;
 using Swashbuckle.AspNetCore.SwaggerGen;
 
-namespace ECommerce.Api.Swagger;
+namespace ECommerce.Api.Extensions.Swagger;
 
 public static class SwaggerExtensions
 {
@@ -22,7 +22,7 @@ public static class SwaggerExtensions
             });
 
             options.OperationFilter<AuthorizationFilter>();
-        });
+        }); 
 
         return services;
     }

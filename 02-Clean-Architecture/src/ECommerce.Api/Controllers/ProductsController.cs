@@ -4,6 +4,7 @@ using Microsoft.AspNetCore.RateLimiting;
 using MediatR;
 using ECommerce.Contracts.Common;
 using ECommerce.Application.Products;
+using ECommerce.Application.Common;
 
 namespace ECommerce.Api.Controllers;
 
@@ -21,7 +22,7 @@ public class ProductsController : ControllerBase
     [HttpGet]
     public async Task<IActionResult> GetAllProducts([FromQuery] PaginationRequest paginationRequest)
     {
-        var command = new GetAllProductsQuery(paginationRequest.Page, paginationRequest.RecordsPerPage);
+        var command = new GetAllProductsQuery(new PaginationDto(paginationRequest.Page, paginationRequest.RecordsPerPage));
         var result = await _mediator.Send(command);
 
         return Ok(result.Data);

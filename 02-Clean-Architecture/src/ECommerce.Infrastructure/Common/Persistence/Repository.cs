@@ -1,9 +1,9 @@
 using System.Linq.Expressions;
+using ECommerce.Application.Common;
 using ECommerce.Application.Repositories;
-using ECommerce.Infrastructure.Persistence;
 using Microsoft.EntityFrameworkCore;
 
-namespace ECommerce.Infrastructure;
+namespace ECommerce.Infrastructure.Persistence;
 
 public class Repository<T> : IRepository<T> where T : class
 {
@@ -14,6 +14,18 @@ public class Repository<T> : IRepository<T> where T : class
         _context = context;
     }
 
+    public async Task<PagedResult<T>> GetPagedAsync(PaginationDto pagination)
+    {
+        var query = GetQueryable();
+        var totalRecords = await query.CountAsync();
+        var data = await query
+            .Skip((pagination.Page - 1) * pagination.RecordsPerPage)
+            .Take(pagination.RecordsPerPage)
+            .ToListAsync();
+
+        return new PagedResult<T>(data, totalRecords, pagination.Page, pagination.RecordsPerPage);
+    }
+    
     public async Task<T?> GetByIdAsync(int id)
     {
         return await _context.Set<T>().FindAsync(id);
