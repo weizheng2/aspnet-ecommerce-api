@@ -37,10 +37,10 @@ jobs:
           ${{ runner.os }}-nuget-
           
     - name: Restore dependencies
-      run: dotnet restore
-
-    - name: Build
-      run: dotnet build --no-restore --configuration Release
+      run: dotnet restore 01-Layered-Architecture/ECommerceApi.sln
+    
+    - name: Build solution
+      run: dotnet build 01-Layered-Architecture/ECommerceApi.sln --no-restore --configuration Release
 
     - name: Run Unit Tests
       run: dotnet test 01-Layered-Architecture/ECommerceApi.UnitTests --no-build --verbosity normal
@@ -49,18 +49,21 @@ jobs:
       run: dotnet test 01-Layered-Architecture/ECommerceApi.IntegrationTests --no-build --verbosity normal
 
     - name: Publish app
-      run: dotnet publish 01-Layered-Architecture/ECommerceApi --configuration Release --output ./publish --runtime win-x64
+      run: dotnet publish 01-Layered-Architecture/ECommerceApi \
+            --configuration Release \
+            --runtime win-x64 \
+            --output 01-Layered-Architecture/ECommerceApi/bin/Publish
 
-    # Packages ./publish folder and uploads it as an artifact (a portable bundle).
     - name: Upload publish artifact
       uses: actions/upload-artifact@v4.6.2
       with:
         name: app
-        path: ./publish
+        path: 01-Layered-Architecture/ECommerceApi/bin/Publish
         
-  build_and_deploy:
+  build-and-deploy:
     needs: build-and-test
     runs-on: windows-latest
+
     steps:
     - name: Download artifact
       uses: actions/download-artifact@v5.0.0
