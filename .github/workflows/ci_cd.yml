@@ -49,11 +49,8 @@ jobs:
       run: dotnet test 01-Layered-Architecture/ECommerceApi.IntegrationTests/ECommerceApi.IntegrationTests.csproj --verbosity normal
 
     - name: Publish app
-      run: dotnet publish 01-Layered-Architecture/ECommerceApi \
-            --configuration Release \
-            --runtime win-x64 \
-            --output 01-Layered-Architecture/ECommerceApi/bin/Publish
-
+      run: dotnet publish 01-Layered-Architecture/ECommerceApi --configuration Release --runtime win-x64 --output 01-Layered-Architecture/ECommerceApi/bin/Publish
+      
     - name: Upload publish artifact
       uses: actions/upload-artifact@v4.6.2
       with:
