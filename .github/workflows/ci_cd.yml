@@ -37,10 +37,10 @@ jobs:
           ${{ runner.os }}-nuget-
           
     - name: Restore dependencies
-      run: dotnet restore 01-Layered-Architecture/ECommerceApi.sln
+      run: dotnet restore 01-Layered-Architecture/ECommerce.sln
     
     - name: Build solution
-      run: dotnet build 01-Layered-Architecture/ECommerceApi.sln --no-restore --configuration Release
+      run: dotnet build 01-Layered-Architecture/ECommerce.sln --no-restore --configuration Release
 
     - name: Run Unit Tests
       run: dotnet test 01-Layered-Architecture/ECommerceApi.UnitTests --no-build --verbosity normal
