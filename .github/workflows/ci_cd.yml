@@ -43,10 +43,10 @@ jobs:
       run: dotnet build 01-Layered-Architecture/ECommerce.sln --no-restore --configuration Release
 
     - name: Run Unit Tests
-      run: dotnet test 01-Layered-Architecture/ECommerceApi.UnitTests --no-build --verbosity normal
-
+      run: dotnet test 01-Layered-Architecture/ECommerceApi.UnitTests/ECommerceApi.UnitTests.csproj --verbosity normal
+    
     - name: Run Integration Tests
-      run: dotnet test 01-Layered-Architecture/ECommerceApi.IntegrationTests --no-build --verbosity normal
+      run: dotnet test 01-Layered-Architecture/ECommerceApi.IntegrationTests/ECommerceApi.IntegrationTests.csproj --verbosity normal
 
     - name: Publish app
       run: dotnet publish 01-Layered-Architecture/ECommerceApi \
