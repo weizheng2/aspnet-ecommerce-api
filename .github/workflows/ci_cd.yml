@@ -1,6 +1,5 @@
 name: CI/CD
 
-# When to run this workflow
 on:
   # Manual execution
   workflow_dispatch:
@@ -42,15 +41,18 @@ jobs:
     - name: Build solution
       run: dotnet build 01-Layered-Architecture/ECommerce.sln --no-restore --configuration Release
 
+    # Tests
     - name: Run Unit Tests
       run: dotnet test 01-Layered-Architecture/ECommerceApi.UnitTests/ECommerceApi.UnitTests.csproj --verbosity normal
     
     - name: Run Integration Tests
       run: dotnet test 01-Layered-Architecture/ECommerceApi.IntegrationTests/ECommerceApi.IntegrationTests.csproj --verbosity normal
 
+    # win-x86 (x32) since the MonsterASP requires it
     - name: Publish app
       run: dotnet publish 01-Layered-Architecture/ECommerceApi --configuration Release --runtime win-x86 --output ./publish
-        
+
+    # https://help.monsterasp.net/books/github/page/how-to-deploy-website-via-github-actions
     - name: Deploy to MonsterASP.NET via WebDeploy
       uses: rasmusbuchholdt/simply-web-deploy@2.2.0
       with:
