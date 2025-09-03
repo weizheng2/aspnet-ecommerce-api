@@ -49,7 +49,7 @@ jobs:
       run: dotnet test 01-Layered-Architecture/ECommerceApi.IntegrationTests/ECommerceApi.IntegrationTests.csproj --verbosity normal
 
     - name: Publish app
-      run: dotnet publish 01-Layered-Architecture/ECommerceApi --configuration Release --runtime win-x64 --output ./publish
+      run: dotnet publish 01-Layered-Architecture/ECommerceApi --configuration Release --runtime win-x86 --output ./publish
         
     - name: Deploy to MonsterASP.NET via WebDeploy
       uses: rasmusbuchholdt/simply-web-deploy@2.2.0
