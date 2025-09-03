@@ -50,24 +50,7 @@ jobs:
 
     - name: Publish app
       run: dotnet publish 01-Layered-Architecture/ECommerceApi --configuration Release --runtime win-x64 --output ./publish
-      
-    - name: Upload publish artifact
-      uses: actions/upload-artifact@v4.6.2
-      with:
-        name: app
-        path: ./publish
         
-  build-and-deploy:
-    needs: build-and-test
-    runs-on: windows-latest
-
-    steps:
-    - name: Download artifact
-      uses: actions/download-artifact@v5.0.0
-      with:
-        name: app
-        path: ./publish
-
     - name: Deploy to MonsterASP.NET via WebDeploy
       uses: rasmusbuchholdt/simply-web-deploy@2.2.0
       with:
