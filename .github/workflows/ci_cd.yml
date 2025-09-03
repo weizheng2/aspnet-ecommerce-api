@@ -66,6 +66,7 @@ jobs:
       uses: actions/download-artifact@v5.0.0
       with:
         name: app
+        path: ./publish
 
     - name: Deploy to MonsterASP.NET via WebDeploy
       uses: rasmusbuchholdt/simply-web-deploy@2.2.0
